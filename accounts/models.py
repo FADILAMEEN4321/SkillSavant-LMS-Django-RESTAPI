@@ -20,6 +20,8 @@ class CustomUser(AbstractUser):
 class StudentProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
+    state = models.CharField(max_length=50,blank=True, null=True)
+    country = models.CharField(max_length=50,blank=True, null=True)
     profile_photo = models.ImageField(upload_to='student_profiles/',blank=True, null=True)
 
     def __str__(self):
@@ -29,6 +31,8 @@ class StudentProfile(models.Model):
 class InstructorProfile(models.Model):
      user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
      bio = models.TextField(blank=True, null=True)
+     state = models.CharField(max_length=50,blank=True, null=True)
+     country = models.CharField(max_length=50,blank=True, null=True)
      profile_photo = models.ImageField(upload_to='instructor_profiles/',blank=True, null=True)
 
      def __str__(self):

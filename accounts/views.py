@@ -32,6 +32,7 @@ class StudentLoginAPI(APIView):
                 refresh['role'] = user.role
                 refresh['email'] = user.email
                 refresh['first_name'] = user.first_name
+                refresh['last_name'] = user.last_name
                 data = {
                         'refresh': str(refresh),
                         'access': str(refresh.access_token),
@@ -48,18 +49,6 @@ class StudentLoginAPI(APIView):
 
         except Exception as e:
             print(e)  
-
-
-
-class StudentProfileView(APIView):
-    permission_classes = [IsAuthenticated]
-    def get(self,request,user_id):
-        student_profile = get_object_or_404(StudentProfile,user=user_id)
-        print(student_profile.bio)
-        serializer = StudentProfileSerializer(student_profile)
-        print(serializer.data)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
 
 
 
@@ -84,8 +73,21 @@ class StudentSignupAPI(APIView):
             return Response({'message':'Account created successfully.'},status=status.HTTP_201_CREATED)
         print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class StudentProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request,user_id):
+        student_profile = get_object_or_404(StudentProfile,user=user_id)
+        print(student_profile.bio)
+        serializer = StudentProfileSerializer(student_profile)
+        print(serializer.data)
+        return Response(serializer.data,status=status.HTTP_200_OK)
     
 
+
+    
 class InstructorSignupAPI(APIView):
     def post(self,request):
         serializer = SignupSerializer(data=request.data)
@@ -134,6 +136,7 @@ class InstructorLoginAPI(APIView):
                 refresh['role'] = user.role
                 refresh['email'] = user.email
                 refresh['first_name'] = user.first_name
+                refresh['last_name'] = user.last_name
                 data = {
                         'refresh': str(refresh),
                         'access': str(refresh.access_token),
@@ -155,7 +158,7 @@ class InstructorLoginAPI(APIView):
 
 
 
-#Login View for student
+#Login View for Admin
 class AdminLoginAPI(APIView):
     def post(self,request):
         try:
