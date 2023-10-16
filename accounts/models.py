@@ -14,6 +14,7 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username','role']
     role = models.CharField(max_length=10, choices=ROLES, default='student')
+    is_blocked = models.BooleanField(default=False, blank=True, null=True)
     phone_number = models.CharField(max_length=30, unique=True, blank=True, null=True)
 
 

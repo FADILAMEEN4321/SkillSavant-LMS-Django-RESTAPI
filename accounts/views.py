@@ -7,6 +7,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
+from rest_framework.decorators import api_view
+
 
 
 
@@ -76,8 +79,8 @@ class StudentSignupAPI(APIView):
 
 
 
-class StudentProfileView(APIView):
-    permission_classes = [IsAuthenticated]
+class StudentProfileViewAndEdit(APIView):
+    # permission_classes = [IsAuthenticated]
     def get(self,request,user_id):
         student_profile = get_object_or_404(StudentProfile,user=user_id)
         print(student_profile.bio)
@@ -85,7 +88,15 @@ class StudentProfileView(APIView):
         print(serializer.data)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
-
+    def put(self,request,user_id):
+        student_profile = get_object_or_404(StudentProfile, user=user_id)
+        serializer = CustomUserSerializer(student_profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            student = serializer.save()
+            print('hello',student.user.first_name,student.bio)
+            return Response({'message': 'Profile updated successfully',}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
     
 class InstructorSignupAPI(APIView):
@@ -156,8 +167,6 @@ class InstructorLoginAPI(APIView):
 
 
 
-
-
 #Login View for Admin
 class AdminLoginAPI(APIView):
     def post(self,request):
@@ -198,6 +207,7 @@ class AdminLoginAPI(APIView):
 
 
 
+
 class AdminSignupAPI(APIView):
     def post(self,request):
         serializer = SignupSerializer(data=request.data)
@@ -215,5 +225,26 @@ class AdminSignupAPI(APIView):
         print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 
+
+
+
+class AdminStudentListing(generics.ListCreateAPIView):
+    queryset = StudentProfile.objects.all()
+    serializer_class = StudentListingSerializer
+
+
+@api_view(['POST'])
+def block_unblock_user(request,user_id):
+    try:
+        student = CustomUser.objects.get(id=user_id, role='student')
+        student.is_blocked = not student.is_blocked
+        student.save()
+        serializer = CustomUserSerializer(student)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    except CustomUser.DoesNotExist:
+        return Response({'detail': 'Student not found'}, status=status.HTTP_404_NOT_FOUND)
+
+ 
 
 
