@@ -79,6 +79,7 @@ class StudentSignupAPI(APIView):
 
 
 
+
 class StudentProfileViewAndEdit(APIView):
     # permission_classes = [IsAuthenticated]
     def get(self,request,user_id):
@@ -88,15 +89,77 @@ class StudentProfileViewAndEdit(APIView):
         print(serializer.data)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
+
     def put(self,request,user_id):
         student_profile = get_object_or_404(StudentProfile, user=user_id)
-        serializer = CustomUserSerializer(student_profile, data=request.data, partial=True)
-        if serializer.is_valid():
-            student = serializer.save()
-            print('hello',student.user.first_name,student.bio)
+        # print(student_profile)
+        student_user = student_profile.user
+        # print(student_user)
+
+        student_serializer = StudentListingSerializer(student_profile, data=request.data.get('student_profile'), partial=True)
+        user_serializer = CustomUserSerializer(student_user, data=request.data.get('user'), partial=True)
+
+        if student_serializer.is_valid() and user_serializer.is_valid():
+            student = student_serializer.save()
+            user = user_serializer.save()
+
+            print('student-data----->',student.user.first_name,student.bio)
             return Response({'message': 'Profile updated successfully',}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Return errors if either serializer is invalid
+        errors = {
+            "profile_errors": student_serializer.errors if not student_serializer.is_valid() else None,
+            "user_errors": user_serializer.errors if not user_serializer.is_valid() else None,
+        }
+
+        return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class InstructorProfileViewAndEdit(APIView):
+    # permission_classes = [IsAuthenticated]
+    def get(self,request,user_id):
+        instructor_profile = get_object_or_404(InstructorProfile,user=user_id)
+        print(instructor_profile.bio)
+        serializer = InstructorProfileSerializer(instructor_profile)
+        print(serializer.data)
+        return Response(serializer.data,status=status.HTTP_200_OK)
     
+
+    def put(self,request,user_id):
+        instructor_profile = get_object_or_404(InstructorProfile, user=user_id)
+        # print(student_profile)
+        instructor_user = instructor_profile.user
+        # print(student_user)
+
+        instructor_serializer = InstructorProfileSerializer(instructor_profile, data=request.data.get('instructor_profile'), partial=True)
+        user_serializer = CustomUserSerializer(instructor_user, data=request.data.get('user'), partial=True)
+
+        if instructor_serializer.is_valid() and user_serializer.is_valid():
+            instructor = instructor_serializer.save()
+            user = user_serializer.save()
+            instructor.save()
+            user.save()
+            user_data = {'first_name':user.first_name,'last_name':user.last_name}
+            instructor_data = {'state':instructor.state,'bio':instructor.bio}
+
+            print('student-data----->',instructor.user.first_name,instructor.bio)
+            return Response({'message': 'Profile updated successfully'}, status=status.HTTP_200_OK)
+        
+        # Return errors if either serializer is invalid
+        errors = {
+            "profile_errors": instructor_serializer.errors if not instructor_serializer.is_valid() else None,
+            "user_errors": user_serializer.errors if not user_serializer.is_valid() else None,
+        }
+
+        return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
 
     
 class InstructorSignupAPI(APIView):

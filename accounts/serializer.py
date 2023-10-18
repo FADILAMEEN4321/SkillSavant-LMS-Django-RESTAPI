@@ -52,6 +52,11 @@ class StudentProfileSerializer(serializers.ModelSerializer):
         model = StudentProfile
         fields = '__all__' 
 
+class InstructorProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InstructorProfile
+        fields = '__all__' 
+
 
 class StudentListingSerializer(serializers.ModelSerializer):
     class Meta:
