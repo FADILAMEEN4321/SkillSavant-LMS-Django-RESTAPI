@@ -44,9 +44,14 @@ class Course(models.Model):
     tags = models.ManyToManyField(Tags)
     price = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default='Beginner')
+    is_approved = models.BooleanField(default=False)
     cover_image = models.FileField(upload_to='course_images/',null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
 
 
 class Module(models.Model):
@@ -56,5 +61,8 @@ class Module(models.Model):
     video_url = models.FileField(upload_to='module_videos/')
     course = models.ForeignKey('Course', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)   
+    updated_at = models.DateTimeField(auto_now=True)  
+
+    def __str__(self):
+        return self.module_title 
 
