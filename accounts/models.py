@@ -23,7 +23,7 @@ class StudentProfile(models.Model):
     bio = models.TextField(blank=True, null=True)
     state = models.CharField(max_length=50,blank=True, null=True)
     country = models.CharField(max_length=50,blank=True, null=True)
-    profile_photo = models.ImageField(upload_to='student_profiles/',blank=True, null=True)
+    profile_photo = models.FileField(upload_to='student_profiles/',blank=True, null=True)
 
     def __str__(self):
         return self.user.email 
@@ -35,7 +35,7 @@ class InstructorProfile(models.Model):
      state = models.CharField(max_length=50,blank=True, null=True)
      skill = models.CharField(max_length=50, blank=True, null=True)
      country = models.CharField(max_length=50,blank=True, null=True)
-     profile_photo = models.ImageField(upload_to='instructor_profiles/',blank=True, null=True)
+     profile_photo = models.FileField(upload_to='instructor_profiles/',blank=True, null=True)
 
      def __str__(self):
         return self.user.email
@@ -43,7 +43,7 @@ class InstructorProfile(models.Model):
 
 class AdminProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    profile_photo = models.ImageField(upload_to='admin_profiles/', blank=True, null=True)
+    profile_photo = models.FileField(upload_to='admin_profiles/', blank=True, null=True)
 
     def __str__(self):
         return self.user.email
