@@ -211,9 +211,16 @@ class InstructorLoginAPI(APIView):
                 refresh['email'] = user.email
                 refresh['first_name'] = user.first_name
                 refresh['last_name'] = user.last_name
+
+                instructor = InstructorProfile.objects.get(user=user)
+                serializer = InstructorProfileSerializer(instructor)
+                instructor_data = serializer.data
+
+
                 data = {
                         'refresh': str(refresh),
                         'access': str(refresh.access_token),
+                        'instructor_data':instructor_data,
                         # 'email': str(user.email)
                     }   
                 return Response(data, status=status.HTTP_200_OK)
