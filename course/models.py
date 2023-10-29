@@ -65,4 +65,7 @@ class Module(models.Model):
 
     def __str__(self):
         return self.module_title 
+    
+    class Meta:
+        ordering = ['module_order']
 

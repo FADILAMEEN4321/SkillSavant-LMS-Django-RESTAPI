@@ -14,6 +14,11 @@ urlpatterns = [
      path('admin/tags-list-create/', TagsListCreateView.as_view(), name='tags-list-create'),
      path('admin/tags-retrieve-update-destroy/<int:pk>/', TagsDetailView.as_view(), name='tags-retrieve-update-destroy'),
 
+     path('admin/course-approval-toggle/<int:course_id>/',course_approval_toggle, name="course-approval-toggle"),
+
+     path('admin/pending-courses/',PendingCourseListView.as_view(), name="pending-courses"),
+     path('admin/approved-courses/',ApprovedCoursesListView.as_view(), name="approved-courses"),
+
 
 
 

@@ -26,5 +26,13 @@ class TagsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tags
         fields = '__all__'
+
+
+class CourseSerializerAdmin(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = '__all__'
+        depth = 1
+
         
 
