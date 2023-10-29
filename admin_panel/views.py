@@ -59,6 +59,7 @@ class PendingCourseListView(generics.ListAPIView):
     queryset = Course.objects.filter(is_approved=False)
     serializer_class = CourseSerializerAdmin
 
+
 class ApprovedCoursesListView(generics.ListAPIView):
     queryset = Course.objects.filter(is_approved=True)
     serializer_class = CourseSerializerAdmin

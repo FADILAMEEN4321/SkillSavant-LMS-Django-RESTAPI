@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'accounts',
     'admin_panel',
     'course',
+    'home',
 ]
 
 #Manually added.
@@ -176,7 +177,6 @@ DEFAULT_FILE_STORAGE = "storages.backends.s3.S3Storage"
 
 
 #AWS S3 bucket settings
-
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET')

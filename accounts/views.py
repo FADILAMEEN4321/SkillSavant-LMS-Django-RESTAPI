@@ -159,8 +159,6 @@ class InstructorProfileViewAndEdit(APIView):
 
 
 
-
-
     
 class InstructorSignupAPI(APIView):
     def post(self,request):

@@ -3,14 +3,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.core.exceptions import ValidationError
 from rest_framework import generics
-
 from .models import Course,Module
 from .serializer import CourseSerializer,ModuleSerializer,CourseAndModuleSerializer
 
 
 
 class CourseView(APIView):
-
     def post(self, request):
         try:
             serializer = CourseSerializer(data=request.data)
@@ -58,6 +56,7 @@ class ModuleView(APIView):
         except Exception as e:
             return Response({'message': 'An error occurred while creating the module.', 'error': str(e)},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)  
+
 
 
 class CourseDetailView(generics.RetrieveAPIView):
