@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics
-from course.models import Course
-from .serializer import CourseSerializerHome
+from course.models import Course,Category,SubCategory,Tags
+from .serializer import CourseSerializerHome,CategorySubcategorySerializer,TagsSerializer,CourseDetailSerializer
 
 
 class LastestCourseListingView(generics.ListAPIView):
@@ -12,3 +12,23 @@ class LastestCourseListingView(generics.ListAPIView):
 class PopularCourseListingView(generics.ListAPIView):
     queryset = Course.objects.filter(is_approved = True)[:5]
     serializer_class = CourseSerializerHome
+
+
+class AllCourseListingView(generics.ListAPIView):
+    queryset = Course.objects.filter(is_approved = True)
+    serializer_class = CourseSerializerHome
+
+
+class CategorySubcategoryListingView(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySubcategorySerializer
+
+
+class TagsListingView(generics.ListAPIView):
+    queryset = Tags.objects.all()
+    serializer_class = TagsSerializer  
+
+
+class CourseDetailView(generics.RetrieveAPIView):
+    queryset = Course.objects.all()
+    serializer_class = CourseDetailSerializer      
