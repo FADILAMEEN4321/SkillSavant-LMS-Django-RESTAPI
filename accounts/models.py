@@ -21,8 +21,6 @@ class CustomUser(AbstractUser):
 class StudentProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
-    state = models.CharField(max_length=50,blank=True, null=True)
-    country = models.CharField(max_length=50,blank=True, null=True)
     profile_photo = models.FileField(upload_to='student_profiles/',blank=True, null=True)
 
     def __str__(self):
@@ -32,14 +30,14 @@ class StudentProfile(models.Model):
 class InstructorProfile(models.Model):
      user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
      bio = models.TextField(blank=True, null=True)
-     state = models.CharField(max_length=50,blank=True, null=True)
      skill = models.CharField(max_length=50, blank=True, null=True)
-     country = models.CharField(max_length=50,blank=True, null=True)
      profile_photo = models.FileField(upload_to='instructor_profiles/',blank=True, null=True)
+     wallet = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
      def __str__(self):
         return self.user.email
      
+
 
 class AdminProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)

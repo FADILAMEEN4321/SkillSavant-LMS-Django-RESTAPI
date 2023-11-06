@@ -9,6 +9,8 @@ urlpatterns = [
     path('api/', include('admin_panel.urls')),
     path('api/', include('course.urls')),
     path('api/', include('home.urls')),
+    path('api/', include('enrollment.urls')),
+    path('api/', include('enrollment.razorpay.urls')),
 ]
 
 if settings.DEBUG:

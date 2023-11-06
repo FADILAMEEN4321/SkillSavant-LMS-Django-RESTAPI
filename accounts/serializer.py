@@ -59,10 +59,18 @@ class InstructorProfileSerializer(serializers.ModelSerializer):
 
 
 class StudentListingSerializer(serializers.ModelSerializer):
+    email = serializers.SerializerMethodField()
+
     class Meta:
         model = StudentProfile
         fields = '__all__'
-        depth = 1  
+        depth = 1 
+
+    def get_email(self,obj):
+        email = obj.user.email
+        if email.startswith("student-"):
+            return email[len("student-"):]
+        return email     
 
 
 class CustomUserSerializer(serializers.ModelSerializer):

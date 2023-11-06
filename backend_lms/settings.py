@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'admin_panel',
     'course',
     'home',
+    'enrollment',
 ]
 
 #Manually added.
@@ -181,3 +182,8 @@ AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET')
 AWS_QUERYSTRING_AUTH = False
+
+
+#Razorpay credentials
+RAZOR_PAY_KEY_ID = os.getenv('RAZOR_PAY_KEY_ID')
+RAZOR_PAY_KEY_SECRET = os.getenv('RAZOR_PAY_KEY_SECRET')

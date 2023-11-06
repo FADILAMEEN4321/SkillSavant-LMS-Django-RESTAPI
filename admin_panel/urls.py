@@ -3,7 +3,7 @@ from .views import *
 
 
 urlpatterns = [
-     path('admin/instructors/', AdminInstructorListing.as_view(), name='admin-instructors'),
+     path('admin/instructors-listing/', AdminInstructorListing.as_view(), name='admin-instructors'),
 
      path('admin/categories-list-create/', CategoryListCreateView.as_view(), name='category-list-create'),
      path('admin/categories-retrieve-update-destroy/<int:pk>/', CategoryDetailView.as_view(), name='categories-retrieve-update-destroy'),

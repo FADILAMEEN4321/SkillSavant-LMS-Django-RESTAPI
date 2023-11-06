@@ -31,6 +31,12 @@ class StudentLoginAPI(APIView):
                     }
                     return Response(data, status=status.HTTP_400_BAD_REQUEST)
                 
+                if user.is_blocked:
+                    data = {
+                        'message':'Your account is blocked. Please contact support for assistance.'
+                    }
+                    return Response(data, status=status.HTTP_403_FORBIDDEN)
+                
                 refresh = RefreshToken.for_user(user)  
                 refresh['role'] = user.role
                 refresh['email'] = user.email
@@ -45,10 +51,9 @@ class StudentLoginAPI(APIView):
                 return Response(data, status=status.HTTP_200_OK)
             
             return Response({
-                'status':400,
                 'message':"something went wrong",
                 'data':serializer.errors
-            })  
+            },status=status.HTTP_400_BAD_REQUEST)  
 
         except Exception as e:
             print(e)  
