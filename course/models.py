@@ -45,6 +45,7 @@ class Course(models.Model):
     price = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default='Beginner')
     is_approved = models.BooleanField(default=False)
+    unlisted = models.BooleanField(default=False)
     cover_image = models.FileField(upload_to='course_images/',null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

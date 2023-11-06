@@ -5,17 +5,17 @@ from .serializer import CourseSerializerHome,CategorySubcategorySerializer,TagsS
 
 
 class LastestCourseListingView(generics.ListAPIView):
-    queryset = Course.objects.filter(is_approved = True).order_by('-created_at')[:5]
+    queryset = Course.objects.filter(is_approved = True, unlisted = False).order_by('-created_at')[:5]
     serializer_class = CourseSerializerHome
 
 
 class PopularCourseListingView(generics.ListAPIView):
-    queryset = Course.objects.filter(is_approved = True)[:5]
+    queryset = Course.objects.filter(is_approved = True, unlisted = False)[:5]
     serializer_class = CourseSerializerHome
 
 
 class AllCourseListingView(generics.ListAPIView):
-    queryset = Course.objects.filter(is_approved = True)
+    queryset = Course.objects.filter(is_approved = True, unlisted = False)
     serializer_class = CourseSerializerHome
 
 
