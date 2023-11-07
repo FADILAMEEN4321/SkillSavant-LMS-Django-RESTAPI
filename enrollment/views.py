@@ -3,16 +3,27 @@ from rest_framework.views import APIView
 from course.models import Course
 from rest_framework import status
 from rest_framework.exceptions import NotFound
+from accounts.models import StudentProfile
+from .models import EnrolledCourse
 
 
 
 class VerifyCourseEnrollEligibility(APIView):
-     def post(self,request, course_id):
+     def get(self,request, course_id, student_id):
           try:
             course = Course.objects.get(id = course_id)
+            student = StudentProfile.objects.get(id = student_id)
+
+            if EnrolledCourse.objects.filter(course=course,student=student).exists():
+                response = {
+                    "message":"You are already enrolled in this course."
+                }
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+
             if course.is_approved == True and course.unlisted == False:
                 response = {
-                    "message":"course is eligible for enrollment."
+                    "message":"course is eligible for enrollment.course is approved and listed."
                 }
                 return Response(response, status=status.HTTP_200_OK)
             else:
@@ -23,6 +34,8 @@ class VerifyCourseEnrollEligibility(APIView):
 
           except Course.DoesNotExist:
                raise NotFound("Course not found")
+          except StudentProfile.DoesNotExist:
+              raise NotFound("Student not found.")
           
           except Exception as e:
 
