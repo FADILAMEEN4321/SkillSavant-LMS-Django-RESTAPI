@@ -48,14 +48,31 @@ class SignupSerializer(serializers.ModelSerializer):
 
 #for retriving logged in user details
 class StudentProfileSerializer(serializers.ModelSerializer):
+    email = serializers.SerializerMethodField()
+
     class Meta:
         model = StudentProfile
         fields = '__all__' 
 
+    def get_email(self,obj):
+        email = obj.user.email
+        if email.startswith("student-"):
+            return email[len("student-"):]
+        return email 
+
+
 class InstructorProfileSerializer(serializers.ModelSerializer):
+    email = serializers.SerializerMethodField()
+
     class Meta:
         model = InstructorProfile
         fields = '__all__' 
+
+    def get_email(self,obj):
+        email = obj.user.email
+        if email.startswith("instructor-"):
+            return email[len("instructor-"):]
+        return email    
 
 
 class StudentListingSerializer(serializers.ModelSerializer):

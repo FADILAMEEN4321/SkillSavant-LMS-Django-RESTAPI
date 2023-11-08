@@ -61,6 +61,7 @@ class Module(models.Model):
     module_order = models.PositiveIntegerField()
     video_url = models.FileField(upload_to='module_videos/')
     course = models.ForeignKey('Course', on_delete=models.CASCADE)
+    notes = models.FileField(upload_to='module_notes/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)  
 
