@@ -5,10 +5,14 @@ from django.core.exceptions import ValidationError
 from rest_framework import generics
 from .models import Course,Module
 from .serializer import CourseSerializer,ModuleSerializer,CourseAndModuleSerializer
+from accounts.permissions import IsInstructor
+from rest_framework.permissions import IsAuthenticated
 
 
 
 class CourseView(APIView):
+    permission_classes = [IsInstructor]
+
     def post(self, request):
         try:
             serializer = CourseSerializer(data=request.data)

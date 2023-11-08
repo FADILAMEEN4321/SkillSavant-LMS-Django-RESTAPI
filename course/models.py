@@ -59,6 +59,7 @@ class Module(models.Model):
     module_title = models.CharField(max_length=100)
     duration = models.PositiveIntegerField()
     module_order = models.PositiveIntegerField()
+    description = models.TextField(null=True, blank=True)
     video_url = models.FileField(upload_to='module_videos/')
     course = models.ForeignKey('Course', on_delete=models.CASCADE)
     notes = models.FileField(upload_to='module_notes/', blank=True, null=True)
