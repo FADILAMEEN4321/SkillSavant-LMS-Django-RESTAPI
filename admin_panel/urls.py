@@ -19,6 +19,8 @@ urlpatterns = [
      path('admin/pending-courses/',PendingCourseListView.as_view(), name="pending-courses"),
      path('admin/approved-courses/',ApprovedCoursesListView.as_view(), name="approved-courses"),
 
+     path('admin/sales/', SalesListView.as_view(), name="admin-sales"),
+
 
 
 

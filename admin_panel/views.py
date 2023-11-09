@@ -5,6 +5,8 @@ from .serializer import *
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
+from enrollment.models import Transcation
+from accounts.permissions import IsAdminUser
 
 
 
@@ -63,3 +65,10 @@ class PendingCourseListView(generics.ListAPIView):
 class ApprovedCoursesListView(generics.ListAPIView):
     queryset = Course.objects.filter(is_approved=True)
     serializer_class = CourseSerializerAdmin
+
+
+
+class SalesListView(generics.ListAPIView):
+    queryset = Transcation.objects.all()
+    serializer_class = TransactionSerializer
+    permission_classes =[IsAdminUser]
