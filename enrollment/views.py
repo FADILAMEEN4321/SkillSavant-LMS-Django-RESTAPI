@@ -5,7 +5,9 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound
 from accounts.models import StudentProfile
 from .models import EnrolledCourse
-
+from rest_framework import generics
+from .serializer import EnrolledCourseSerializer
+from accounts.permissions import IsStudent
 
 
 class VerifyCourseEnrollEligibility(APIView):
@@ -45,6 +47,14 @@ class VerifyCourseEnrollEligibility(APIView):
             }
             return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
-               
+
+
+class EnrolledCourseListView(generics.ListAPIView):
+    queryset = EnrolledCourse.objects.all()
+    serializer_class = EnrolledCourseSerializer
+    permission_classes = [IsStudent]
+
+    def get_queryset(self):
+        return EnrolledCourse.objects.filter(student = self.request.user.studentprofile)             
 
 
