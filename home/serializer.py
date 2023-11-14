@@ -69,3 +69,11 @@ class FavouriteCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = FavouriteCourses
         fields = '__all__'
+
+
+class FavouriteCourseListingSerializer(serializers.ModelSerializer):
+    course_details = CourseSerializerHome(source='course', read_only=True)
+
+    class Meta:
+        model = FavouriteCourses
+        fields = ['added_at','course_details','id']        
