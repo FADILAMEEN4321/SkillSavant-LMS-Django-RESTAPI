@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'course',
     'home',
     'enrollment',
+    'openai_api',
 ]
 
 #Manually added.
@@ -194,7 +195,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-
 # USER MODEL FOR AUTHENTICATION
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
@@ -219,3 +219,8 @@ AWS_QUERYSTRING_AUTH = False
 #Razorpay credentials
 RAZOR_PAY_KEY_ID = os.getenv('RAZOR_PAY_KEY_ID')
 RAZOR_PAY_KEY_SECRET = os.getenv('RAZOR_PAY_KEY_SECRET')
+
+
+
+#OpenAI
+OPENAI_API_KEY = os.getenv('OPENAI_API_SECRET_KEY')
