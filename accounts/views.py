@@ -9,6 +9,62 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 from rest_framework.decorators import api_view
+import jwt
+from django.conf import settings
+from django.contrib.auth import get_user_model
+
+
+
+
+class RefreshTokenView(APIView):
+    def post(self, request):
+        try:
+            # Check if the request contains a valid refresh token
+            refresh_token = request.data.get('refresh', None)
+
+            if not refresh_token:
+                return Response({'error': 'No valid refresh token provided.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Attempt to validate the refresh token
+            try:
+                refresh = RefreshToken(refresh_token)
+            
+                # If no exception is raised, it's a valid refresh token
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Refresh token has expired.'}, status=status.HTTP_401_UNAUTHORIZED)
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid refresh token.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            # Decode the refresh token
+            decoded_payload = jwt.decode(jwt=refresh_token, key=settings.SECRET_KEY, algorithms=['HS256'])
+            
+            # Get the user_id from the decoded payload
+            user_id = decoded_payload.get('user_id')
+
+            # Get the user from the Django model using the user_id
+            user = get_user_model().objects.get(id=user_id)
+
+            # Create a new refresh token for the user
+            new_refresh = RefreshToken.for_user(user)  
+            new_refresh['role'] = user.role
+            new_refresh['email'] = user.email
+            new_refresh['first_name'] = user.first_name
+            new_refresh['last_name'] = user.last_name
+
+            # Prepare the response data
+            data = {
+                'refresh': str(new_refresh),
+                'access': str(new_refresh.access_token),
+            }
+
+            return Response(data, status=status.HTTP_200_OK)
+
+        except get_user_model().DoesNotExist:
+            return Response({'error': 'User associated with the refresh token does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'error':f'error: {e}'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
@@ -45,8 +101,6 @@ class StudentLoginAPI(APIView):
                 data = {
                         'refresh': str(refresh),
                         'access': str(refresh.access_token),
-                        # 'email': str(user.email)
-
                     }   
                 return Response(data, status=status.HTTP_200_OK)
             
@@ -223,7 +277,7 @@ class InstructorLoginAPI(APIView):
                 data = {
                         'refresh': str(refresh),
                         'access': str(refresh.access_token),
-                        'instructor_data':instructor_data,
+                        # 'instructor_data':instructor_data,
                         # 'email': str(user.email)
                     }   
                 return Response(data, status=status.HTTP_200_OK)

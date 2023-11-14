@@ -19,5 +19,9 @@ urlpatterns = [
      path('admin/students/', AdminStudentListing.as_view(), name='admin-students'),
      path('admin/students-block-unblock/<int:user_id>/', block_unblock_user, name='admin-block-unblock'),
 
+     path('token/refresh/', RefreshTokenView.as_view(), name='token_refresh'),
+
 
 ]
+
+

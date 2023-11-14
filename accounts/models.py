@@ -18,6 +18,8 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=30, unique=True, blank=True, null=True)
 
 
+
+
 class StudentProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)

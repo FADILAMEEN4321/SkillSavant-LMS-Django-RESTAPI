@@ -49,6 +49,7 @@ class SignupSerializer(serializers.ModelSerializer):
 #for retriving logged in user details
 class StudentProfileSerializer(serializers.ModelSerializer):
     email = serializers.SerializerMethodField()
+    first_name = serializers.CharField(source="user.first_name")
 
     class Meta:
         model = StudentProfile
@@ -77,6 +78,7 @@ class InstructorProfileSerializer(serializers.ModelSerializer):
 
 class StudentListingSerializer(serializers.ModelSerializer):
     email = serializers.SerializerMethodField()
+    student_name = serializers.CharField(source='user.get_full_name')
 
     class Meta:
         model = StudentProfile

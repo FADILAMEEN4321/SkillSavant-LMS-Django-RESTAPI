@@ -56,6 +56,8 @@ class TransactionSerializer(serializers.ModelSerializer):
     instructor_first_name = serializers.CharField(source="instructor.user.first_name")
     instructor_last_name = serializers.CharField(source="instructor.user.last_name")
     course_title = serializers.CharField(source="course.title")
+    transaction_date = serializers.DateTimeField(format="%d-%m-%Y")
+    # %H:%M:%S
 
     class Meta:
         model = Transcation

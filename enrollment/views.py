@@ -10,6 +10,7 @@ from .serializer import EnrolledCourseSerializer
 from accounts.permissions import IsStudent
 
 
+
 class VerifyCourseEnrollEligibility(APIView):
      def get(self,request, course_id, student_id):
           try:

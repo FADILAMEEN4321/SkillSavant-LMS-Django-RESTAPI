@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import InstructorProfile
+from accounts.models import InstructorProfile,StudentProfile
 
 # Create your models here
 
@@ -72,3 +72,9 @@ class Module(models.Model):
     class Meta:
         ordering = ['module_order']
 
+
+
+class FavouriteCourses(models.Model):
+    course = models.ForeignKey('Course', on_delete=models.CASCADE)
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now=True)

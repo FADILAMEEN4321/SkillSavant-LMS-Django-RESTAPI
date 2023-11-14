@@ -56,8 +56,13 @@ class EnrollmentCompletionAPIView(APIView):
             razor_pay_order_id = request.data['order_id']
             razor_pay_signature = request.data['signature']
             total_amount = Decimal(request.data['total_amount'])
-            instructor_share = round(total_amount * Decimal('0.30'), 2)
-            company_share = round(total_amount * Decimal('0.70'), 2)
+            instructor_share = round(total_amount * Decimal('0.70'), 2)
+            company_share = round(total_amount * Decimal('0.30'), 2)
+
+
+            #adding instructor share to wallet
+            instructor.wallet = instructor_share
+            instructor.save()
             
 
             enroll_course_data = {
@@ -95,9 +100,6 @@ class EnrollmentCompletionAPIView(APIView):
             #     print("Transaction Errors:", transcation_serializer.errors)
 
 
-
-
-
             if (
                 enroll_course_serializer.is_valid()
                 and 
@@ -108,7 +110,7 @@ class EnrollmentCompletionAPIView(APIView):
                 rz_client.verify_payment(
                 razorpay_order_id = transcation_serializer.validated_data['order_id'],
                 razorpay_payment_id = transcation_serializer.validated_data['payment_id'],
-                    razorpay_signature = transcation_serializer.validated_data['signature']
+                razorpay_signature = transcation_serializer.validated_data['signature']
                 )
 
                 enroll_course_serializer.save()
@@ -145,4 +147,6 @@ class EnrollmentCompletionAPIView(APIView):
                    "message": e
                 }
             )
+
+
 
