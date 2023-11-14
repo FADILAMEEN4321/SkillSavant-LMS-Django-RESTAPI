@@ -6,7 +6,8 @@ from .serializer import (
     CategorySubcategorySerializer,
     TagsSerializer,
     CourseDetailSerializer,
-    FavouriteCourseSerializer
+    FavouriteCourseSerializer,
+    FavouriteCourseListingSerializer,
 )
 from rest_framework import status
 from rest_framework.response import Response
@@ -66,9 +67,7 @@ class FavouriteCourseRemoveView(generics.DestroyAPIView):
     def get_object(self):
         course_id = self.kwargs.get('course_id')
         student_id = self.kwargs.get('student_id')
-        print('course-id--->',course_id)
-        print('student-id--->',student_id)
-
+        
         favorite_course = FavouriteCourses.objects.filter(
             course=course_id,
             student = student_id
@@ -79,7 +78,15 @@ class FavouriteCourseRemoveView(generics.DestroyAPIView):
 
         return favorite_course
     
-   
+
+
+class FavouriteCourseListingView(generics.ListAPIView):
+    serializer_class = FavouriteCourseListingSerializer
+
+    def get_queryset(self):
+        student_id = self.kwargs.get('student_id')
+        favourite_courses = FavouriteCourses.objects.filter(student=student_id)
+        return favourite_courses
     
 
 
