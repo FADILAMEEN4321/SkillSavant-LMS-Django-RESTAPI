@@ -12,7 +12,7 @@ class LearningPathCreationApi(APIView):
         try:
             course = request.data['course']
 
-            prompt = f"Create a timelined learning path for the course '{course}'. Include relevant topics, resources, and activities. Limit to 50 words."
+            prompt = f"Create a learning path for the course '{course}'. Include relevant topics, resources, and activities. Limit to 50 words. Dont reply to any other questions. Only respond a valid course name is given."
 
             completion = openAI_client.chat.completions.create(
                 model="gpt-3.5-turbo",
@@ -24,7 +24,7 @@ class LearningPathCreationApi(APIView):
 #     {"role": "user", "content": "Compose a poem that explains the concept of recursion in programming."}
 #   ]
             )
-            print(completion.choices[0].message)
+            
 
             return Response(completion.choices[0].message, status=status.HTTP_200_OK)
 
