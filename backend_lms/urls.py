@@ -12,6 +12,7 @@ urlpatterns = [
     path('api/', include('enrollment.urls')),
     path('api/', include('enrollment.razorpay.urls')),
     path('api/', include('openai_api.urls')),
+    path('api/', include('chat.urls')),
 ]
 
 if settings.DEBUG:

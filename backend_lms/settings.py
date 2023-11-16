@@ -36,6 +36,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,7 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    "corsheaders",
+    'corsheaders',
+    
 
 
 
@@ -54,6 +57,7 @@ INSTALLED_APPS = [
     'home',
     'enrollment',
     'openai_api',
+    'chat',
 ]
 
 #Manually added.
@@ -136,6 +140,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend_lms.wsgi.application'
+ASGI_APPLICATION = 'backend_lms.routing.application'
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+        }
+    }
+
+
 
 
 # Database
@@ -205,9 +219,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #added manually
 CORS_ALLOW_ALL_ORIGINS = True
 
+
 # Storage settings
 DEFAULT_FILE_STORAGE = "storages.backends.s3.S3Storage"
-
 
 #AWS S3 bucket settings
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY')
@@ -224,3 +238,7 @@ RAZOR_PAY_KEY_SECRET = os.getenv('RAZOR_PAY_KEY_SECRET')
 
 #OpenAI
 OPENAI_API_KEY = os.getenv('OPENAI_API_SECRET_KEY')
+
+
+
+

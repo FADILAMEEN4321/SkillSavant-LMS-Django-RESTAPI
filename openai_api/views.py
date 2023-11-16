@@ -32,5 +32,8 @@ class LearningPathCreationApi(APIView):
         except Exception as e:
             print(e)
             return Response(f'{e}:Error generating learning path', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+        
 
 
