@@ -13,6 +13,7 @@ from accounts.models import StudentProfile,InstructorProfile
 from enrollment.models import Transcation,Payment,EnrolledCourse
 from rest_framework.serializers import ValidationError
 from decimal import Decimal
+from enrollment.tasks import send_enrollment_email
 
 
 
@@ -109,6 +110,16 @@ class EnrollmentCompletionAPIView(APIView):
                 enroll_course_serializer.save()
                 payment_serializer.save()
                 transcation_serializer.save()
+
+                student_email = student.user.formatted_student_email()
+
+                # Sending email asynchronously using Celery
+                print('before celery')
+                print('before celery',student_email,course.title)
+                send_enrollment_email.delay(student_email= student_email, course_title=course.title)
+                print('after celery')
+
+
 
                 response = {
                     "message":"Course Enrollment Successfull"
