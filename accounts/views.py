@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from .permissions import IsAdminUser
 from rest_framework import generics
 from rest_framework.decorators import api_view
 import jwt
@@ -51,7 +51,7 @@ class RefreshTokenView(APIView):
             new_refresh['first_name'] = user.first_name
             new_refresh['last_name'] = user.last_name
 
-            # Prepare the response data
+          
             data = {
                 'refresh': str(new_refresh),
                 'access': str(new_refresh.access_token),
@@ -64,8 +64,6 @@ class RefreshTokenView(APIView):
 
         except Exception as e:
             return Response({'error':f'error: {e}'}, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 
@@ -216,8 +214,6 @@ class InstructorProfileViewAndEdit(APIView):
 
 
 
-
-
     
 class InstructorSignupAPI(APIView):
     def post(self,request):
@@ -293,7 +289,6 @@ class InstructorLoginAPI(APIView):
 
 
 
-
 #Login View for Admin
 class AdminLoginAPI(APIView):
     def post(self,request):
@@ -334,7 +329,6 @@ class AdminLoginAPI(APIView):
 
 
 
-
 class AdminSignupAPI(APIView):
     def post(self,request):
         serializer = SignupSerializer(data=request.data)
@@ -354,10 +348,10 @@ class AdminSignupAPI(APIView):
 
 
 
-
 class AdminStudentListing(generics.ListCreateAPIView):
     queryset = StudentProfile.objects.all()
     serializer_class = StudentListingSerializer
+    permission_classes = [IsAdminUser]
 
 
 @api_view(['POST'])

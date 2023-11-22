@@ -7,6 +7,12 @@ from .models import Course,Module
 from .serializer import CourseSerializer,ModuleSerializer,CourseAndModuleSerializer
 from accounts.permissions import IsInstructor
 from rest_framework.permissions import IsAuthenticated
+from moviepy.editor import VideoFileClip
+from django.core.files.uploadedfile import InMemoryUploadedFile,TemporaryUploadedFile
+import io
+import os
+import tempfile
+from datetime import timedelta
 
 
 
@@ -32,7 +38,7 @@ class CourseView(APIView):
 
     def get(self,request,instructor_id):
         try:
-            courses = Course.objects.filter(instructor=instructor_id)
+            courses = Course.objects.filter(instructor=instructor_id, unlisted=False)
             serializer = CourseSerializer(courses, many=True)
             return Response(serializer.data,status=status.HTTP_200_OK)
         
@@ -43,6 +49,41 @@ class CourseView(APIView):
             return Response({'message': 'An error occurred while fetching courses.', 'error': str(e)},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+
+
+class UnlistCourseView(APIView):
+    permission_classes = [IsInstructor]
+
+    def get(self, request, course_id):
+        try:
+            course = Course.objects.filter(id=course_id).first()
+
+            if not course:
+                raise ValueError("Course not found with the given course_id.")
+
+            course.unlisted = True
+            course.save()
+
+            response = {
+                "message": "Course unlisted successfully."
+            }
+            return Response(response, status=status.HTTP_200_OK)
+
+        except ValueError as ve:
+            response = {
+                "error": str(ve)
+            }
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            response = {
+                "error": f"An error occurred while processing the request:{e}"
+            }
+            return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+
         
 
 
@@ -52,14 +93,67 @@ class ModuleView(APIView):
             serializer = ModuleSerializer(data=request.data)
 
             if serializer.is_valid():
+                module_order = serializer.validated_data.get('module_order')
+                course_id = serializer.validated_data.get('course')
+
+                if Module.objects.filter(course=course_id, module_order=module_order).exists():
+                    response = {
+                        "message":"module order already exists."
+                    }
+                    return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+
+                # Extracting video duration
+                video_url = serializer.validated_data.get('video_url')
+                duration = self.get_video_duration(video_url)
+                serializer.validated_data['duration'] = duration
+
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
+            print(f"{e}:error")
             return Response({'message': 'An error occurred while creating the module.', 'error': str(e)},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)  
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+        
+
+    def get_video_duration(self, video_url):
+        try:
+            if isinstance(video_url, (InMemoryUploadedFile, TemporaryUploadedFile)):
+                # Handle both in-memory and on-disk files
+                video_content = video_url.read()
+
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_video_file:
+                    temp_video_path = temp_video_file.name
+                    temp_video_file.write(video_content)
+
+                video_clip = VideoFileClip(temp_video_path)
+             
+                video_duration_seconds = int(video_clip.duration)
+
+                # Convert duration to timedelta
+                video_duration_timedelta = timedelta(seconds=video_duration_seconds)
+
+                video_clip.close()  # Explicitly close the video clip
+                os.remove(temp_video_path)  # Clean up the temporary file
+
+                return video_duration_timedelta
+            else:
+                raise ValueError("Unsupported file type")     
+
+        except Exception as e:
+            # Log the exception or handle it in a way that suits your application
+            print(f"Error getting video duration: {e}")
+            return timedelta()    
+
+
+
+class ModuleDeleteView(generics.DestroyAPIView):
+    permission_classes = [IsInstructor]
+    queryset = Module.objects.all()
+    serializer_class = ModuleSerializer
 
 
 

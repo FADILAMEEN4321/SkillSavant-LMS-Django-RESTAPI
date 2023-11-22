@@ -16,7 +16,7 @@ from decimal import Decimal
 
 
 
-#object for razorpay client
+#Object for razorpay client
 rz_client = RazorpayClient()
 
 
@@ -46,7 +46,6 @@ class CreateOrderAPIView(APIView):
 
 class EnrollmentCompletionAPIView(APIView):
     def post(self, request):
-        print(request.data)
         try:
             #All data required
             course = Course.objects.get(id = request.data['course'])
@@ -92,13 +91,7 @@ class EnrollmentCompletionAPIView(APIView):
             payment_serializer = PaymentSerializer(data=payment_data)
             transcation_serializer = TranscationSerializer(data=transcation_data)
 
-            # if not enroll_course_serializer.is_valid():
-            #     print("Enroll Course Errors:", enroll_course_serializer.errors)
-            # if not payment_serializer.is_valid():
-            #     print("Payment Errors:", payment_serializer.errors)
-            # if not transcation_serializer.is_valid():
-            #     print("Transaction Errors:", transcation_serializer.errors)
-
+        
 
             if (
                 enroll_course_serializer.is_valid()

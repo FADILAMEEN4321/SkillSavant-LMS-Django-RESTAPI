@@ -12,7 +12,9 @@ from accounts.permissions import IsStudent
 
 
 class VerifyCourseEnrollEligibility(APIView):
-     def get(self,request, course_id, student_id):
+    permission_classes = [IsStudent]
+
+    def get(self,request, course_id, student_id):
           try:
             course = Course.objects.get(id = course_id)
             student = StudentProfile.objects.get(id = student_id)

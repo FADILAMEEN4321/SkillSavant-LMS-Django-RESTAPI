@@ -47,8 +47,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
-    
-
 
 
     'accounts',
@@ -68,9 +66,6 @@ REST_FRAMEWORK = {
 }
 
 
-# SIMPLE_JWT = {
-#     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
-#     }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
@@ -112,7 +107,6 @@ MIDDLEWARE = [
     #added manually
     "corsheaders.middleware.CorsMiddleware",
 
-
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -139,6 +133,7 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'backend_lms.wsgi.application'
 ASGI_APPLICATION = 'backend_lms.routing.application'
 
@@ -148,7 +143,6 @@ CHANNEL_LAYERS = {
         'BACKEND': "channels.layers.InMemoryChannelLayer"
         }
     }
-
 
 
 
@@ -238,7 +232,6 @@ RAZOR_PAY_KEY_SECRET = os.getenv('RAZOR_PAY_KEY_SECRET')
 
 #OpenAI
 OPENAI_API_KEY = os.getenv('OPENAI_API_SECRET_KEY')
-
 
 
 

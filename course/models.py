@@ -1,7 +1,8 @@
 from django.db import models
 from accounts.models import InstructorProfile,StudentProfile
+from datetime import timedelta
 
-# Create your models here
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -52,12 +53,33 @@ class Course(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def total_duration(self):
+        total_duration = timedelta()
+
+        for module in self.module_set.all():
+            total_duration += module.duration
+
+        # Calculate hours, minutes, and seconds
+        hours, remainder = divmod(total_duration.total_seconds(), 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        # Format the result
+        formatted_duration = "{:02}:{:02}:{:02}".format(int(hours), int(minutes), int(seconds))
+        return formatted_duration
+
+
+    def formatted_created_at(self):
+        return self.created_at.strftime("%d-%m-%Y")
+
+    class Meta:
+        ordering = ['created_at']    
 
 
 
 class Module(models.Model):
     module_title = models.CharField(max_length=100)
-    duration = models.PositiveIntegerField()
+    duration = models.DurationField(default=timedelta(), null=True, blank=True)
     module_order = models.PositiveIntegerField()
     description = models.TextField(null=True, blank=True)
     video_url = models.FileField(upload_to='module_videos/')
@@ -78,3 +100,5 @@ class FavouriteCourses(models.Model):
     course = models.ForeignKey('Course', on_delete=models.CASCADE)
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now=True)
+
+

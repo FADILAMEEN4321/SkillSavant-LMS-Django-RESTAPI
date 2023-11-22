@@ -64,6 +64,7 @@ class StudentProfileSerializer(serializers.ModelSerializer):
 
 class InstructorProfileSerializer(serializers.ModelSerializer):
     email = serializers.SerializerMethodField()
+    first_name = serializers.CharField(source="user.first_name")
 
     class Meta:
         model = InstructorProfile

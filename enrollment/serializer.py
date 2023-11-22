@@ -16,3 +16,5 @@ class EnrolledCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = EnrolledCourse
         fields = '__all__'
+
+       

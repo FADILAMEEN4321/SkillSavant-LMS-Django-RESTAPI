@@ -22,8 +22,5 @@ urlpatterns = [
      path('admin/sales/', SalesListView.as_view(), name="admin-sales"),
 
 
-
-
-
     
 ]

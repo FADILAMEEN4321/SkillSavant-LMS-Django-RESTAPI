@@ -12,6 +12,7 @@ from .serializer import (
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
+from accounts.permissions import IsStudent
 
 
 
@@ -30,15 +31,6 @@ class AllCourseListingView(generics.ListAPIView):
     queryset = Course.objects.filter(is_approved = True, unlisted = False)
     serializer_class = CourseSerializerHome
 
-    # def get_queryset(self):
-    #     # Include additional queryset filtering if needed
-    #     queryset = Course.objects.filter(is_approved=True, unlisted=False)
-    #     return queryset
-    
-    # def list(self, request, *args, **kwargs):
-    #     # Pass request context to serializer
-    #     serializer = self.get_serializer(self.get_queryset(), context={'request': request}, many=True)
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CategorySubcategoryListingView(generics.ListAPIView):
@@ -59,10 +51,13 @@ class CourseDetailView(generics.RetrieveAPIView):
 class FavouriteCourseAddView(generics.CreateAPIView):
     queryset = FavouriteCourses.objects.all()
     serializer_class = FavouriteCourseSerializer
+    permission_classes = [IsStudent]
+
 
 
 class FavouriteCourseRemoveView(generics.DestroyAPIView):
     serializer_class = FavouriteCourseSerializer
+    permission_classes = [IsStudent]
 
     def get_object(self):
         course_id = self.kwargs.get('course_id')
@@ -82,6 +77,7 @@ class FavouriteCourseRemoveView(generics.DestroyAPIView):
 
 class FavouriteCourseListingView(generics.ListAPIView):
     serializer_class = FavouriteCourseListingSerializer
+    permission_classes = [IsStudent]
 
     def get_queryset(self):
         student_id = self.kwargs.get('student_id')

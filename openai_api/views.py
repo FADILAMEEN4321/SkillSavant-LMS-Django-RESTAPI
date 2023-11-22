@@ -12,7 +12,7 @@ class LearningPathCreationApi(APIView):
         try:
             course = request.data['course']
 
-            prompt = f"Create a learning path for the course '{course}'. Include relevant topics, resources, and activities. Limit to 50 words. Dont reply to any other questions. Only respond a valid course name is given."
+            prompt = f"Create a learning path for the course '{course}'. Include relevant topics, resources, and activities. Limit to 50 words. Dont reply to any other questions. Only respond to a valid course name is given. The response should be in bullet point format."
 
             completion = openAI_client.chat.completions.create(
                 model="gpt-3.5-turbo",

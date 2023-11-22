@@ -9,6 +9,7 @@ class CourseSerializerHome(serializers.ModelSerializer):
     instructor_first_name = serializers.CharField(source='instructor.user.first_name', read_only=True)
     instructor_last_name = serializers.CharField(source='instructor.user.last_name', read_only=True)
     is_favourite = serializers.SerializerMethodField()
+    duration = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -21,7 +22,11 @@ class CourseSerializerHome(serializers.ModelSerializer):
             user = request.user
             student = StudentProfile.objects.get(user=user)
             return FavouriteCourses.objects.filter(student=student, course=obj).exists()
-        return False    
+        return False
+
+    def get_duration(self, obj):
+        return obj.total_duration()
+           
 
 
 class TagsSerializer(serializers.ModelSerializer):
@@ -77,3 +82,5 @@ class FavouriteCourseListingSerializer(serializers.ModelSerializer):
     class Meta:
         model = FavouriteCourses
         fields = ['added_at','course_details','id']        
+
+

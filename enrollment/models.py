@@ -8,6 +8,7 @@ class EnrolledCourse(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
     enrollment_date = models.DateTimeField(auto_now_add=True)
+    module_completion_status = models.JSONField(default=dict, null=True, blank=True)
 
 
 

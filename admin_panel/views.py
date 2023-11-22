@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework import generics
 from accounts.models import *
 from .serializer import *
@@ -13,36 +12,50 @@ from accounts.permissions import IsAdminUser
 class AdminInstructorListing(generics.ListCreateAPIView):
     queryset = InstructorProfile.objects.all()
     serializer_class = InstructorSerializer
+    permission_classes = [IsAdminUser]
+
 
 
 class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAdminUser]
+
 
 
 class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAdminUser]
+
 
 
 class SubCategoryListCreateView(generics.ListCreateAPIView):
     queryset = SubCategory.objects.all()
     serializer_class = SubCategorySerializer
+    permission_classes = [IsAdminUser]
+
 
 
 class SubCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = SubCategory.objects.all()
     serializer_class = SubCategorySerializer
+    permission_classes = [IsAdminUser]
+
 
 
 class TagsListCreateView(generics.ListCreateAPIView):
     queryset = Tags.objects.all()
     serializer_class = TagsSerializer
+    permission_classes = [IsAdminUser]
+
 
 
 class TagsDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Tags.objects.all()
-    serializer_class = TagsSerializer    
+    serializer_class = TagsSerializer
+    permission_classes = [IsAdminUser]
+
 
 
 @api_view(['PUT'])
@@ -57,14 +70,18 @@ def course_approval_toggle(request,course_id):
         return Response({'details':'course not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
+
 class PendingCourseListView(generics.ListAPIView):
     queryset = Course.objects.filter(is_approved=False)
     serializer_class = CourseSerializerAdmin
+    permission_classes = [IsAdminUser]
+
 
 
 class ApprovedCoursesListView(generics.ListAPIView):
     queryset = Course.objects.filter(is_approved=True)
     serializer_class = CourseSerializerAdmin
+    permission_classes = [IsAdminUser]
 
 
 

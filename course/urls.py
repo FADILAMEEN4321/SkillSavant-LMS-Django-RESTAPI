@@ -9,5 +9,9 @@ urlpatterns = [
 
     path('courses-details/<int:pk>/', CourseDetailView.as_view(), name='courses-details'),
 
+    path('unlist-course/<int:course_id>/', UnlistCourseView.as_view(), name='unlist-course'),
+
+    path('module-delete/<int:pk>/', ModuleDeleteView.as_view(), name="module-delete")
+
 
 ]

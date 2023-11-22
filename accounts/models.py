@@ -19,7 +19,6 @@ class CustomUser(AbstractUser):
 
 
 
-
 class StudentProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
@@ -28,6 +27,7 @@ class StudentProfile(models.Model):
     def __str__(self):
         return self.user.email 
     
+
 
 class InstructorProfile(models.Model):
      user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
