@@ -17,20 +17,22 @@ class CustomUser(AbstractUser):
     is_blocked = models.BooleanField(default=False, blank=True, null=True)
     phone_number = models.CharField(max_length=30, unique=True, blank=True, null=True)
 
+
     def formatted_student_email(self):
         email = self.email
         if email.startswith("student-"):
              return email[len("student-"):]
         return email
+    
+
+    def formatted_instructor_email(self):
+        email = self.email
+        if email.startswith("instructor-"):
+            return email[len("instructor-"):]
+        return email
         
 
 
-
-#  def get_email(self,obj):
-#         email = obj.user.email
-#         if email.startswith("student-"):
-#             return email[len("student-"):]
-#         return email 
 
 
 class StudentProfile(models.Model):
@@ -40,6 +42,10 @@ class StudentProfile(models.Model):
 
     def __str__(self):
         return self.user.email
+    
+    # def get_student_email(self):
+    #     email = self.user.email.formatted_student_email()
+    #     return email
 
     
 
