@@ -140,11 +140,15 @@ WSGI_APPLICATION = 'backend_lms.wsgi.application'
 ASGI_APPLICATION = 'backend_lms.routing.application'
 
 
+
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': "channels.layers.InMemoryChannelLayer"
-        }
-    }
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 
 
