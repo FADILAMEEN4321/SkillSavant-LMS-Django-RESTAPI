@@ -14,338 +14,374 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 
-
-
 class RefreshTokenView(APIView):
     def post(self, request):
         try:
             # Check if the request contains a valid refresh token
-            refresh_token = request.data.get('refresh', None)
+            refresh_token = request.data.get("refresh", None)
 
             if not refresh_token:
-                return Response({'error': 'No valid refresh token provided.'}, status=status.HTTP_400_BAD_REQUEST)
-            
+                return Response(
+                    {"error": "No valid refresh token provided."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             # Attempt to validate the refresh token
             try:
                 refresh = RefreshToken(refresh_token)
-            
+
                 # If no exception is raised, it's a valid refresh token
             except jwt.ExpiredSignatureError:
-                return Response({'error': 'Refresh token has expired.'}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(
+                    {"error": "Refresh token has expired."},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
             except jwt.InvalidTokenError:
-                return Response({'error': 'Invalid refresh token.'}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(
+                    {"error": "Invalid refresh token."},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
 
             # Decode the refresh token
-            decoded_payload = jwt.decode(jwt=refresh_token, key=settings.SECRET_KEY, algorithms=['HS256'])
-            
+            decoded_payload = jwt.decode(
+                jwt=refresh_token, key=settings.SECRET_KEY, algorithms=["HS256"]
+            )
+
             # Get the user_id from the decoded payload
-            user_id = decoded_payload.get('user_id')
+            user_id = decoded_payload.get("user_id")
 
             # Get the user from the Django model using the user_id
             user = get_user_model().objects.get(id=user_id)
 
             # Create a new refresh token for the user
-            new_refresh = RefreshToken.for_user(user)  
-            new_refresh['role'] = user.role
-            new_refresh['email'] = user.email
-            new_refresh['first_name'] = user.first_name
-            new_refresh['last_name'] = user.last_name
+            new_refresh = RefreshToken.for_user(user)
+            new_refresh["role"] = user.role
+            new_refresh["email"] = user.email
+            new_refresh["first_name"] = user.first_name
+            new_refresh["last_name"] = user.last_name
 
-          
             data = {
-                'refresh': str(new_refresh),
-                'access': str(new_refresh.access_token),
+                "refresh": str(new_refresh),
+                "access": str(new_refresh.access_token),
             }
 
             return Response(data, status=status.HTTP_200_OK)
 
         except get_user_model().DoesNotExist:
-            return Response({'error': 'User associated with the refresh token does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "User associated with the refresh token does not exist."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         except Exception as e:
-            return Response({'error':f'error: {e}'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": f"error: {e}"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
-
-#Login View for student
+# Login View for student
 class StudentLoginAPI(APIView):
-    def post(self,request):
+    def post(self, request):
         try:
             data = request.data
-            serializer = LoginSerializer(data = data)
+            serializer = LoginSerializer(data=data)
             if serializer.is_valid():
-                email = 'student-' + serializer.data['email']
-                password = serializer.data['password']
+                email = "student-" + serializer.data["email"]
+                password = serializer.data["password"]
 
-                user = authenticate(email=email,password=password)
+                user = authenticate(email=email, password=password)
 
-                if user is None or user.role != 'student':
+                if user is None or user.role != "student":
                     data = {
-                        'message': 'invalid credentials',
+                        "message": "invalid credentials",
                     }
                     return Response(data, status=status.HTTP_400_BAD_REQUEST)
-                
+
                 if user.is_blocked:
                     data = {
-                        'message':'Your account is blocked. Please contact support for assistance.'
+                        "message": "Your account is blocked. Please contact support for assistance."
                     }
                     return Response(data, status=status.HTTP_403_FORBIDDEN)
-                
-                refresh = RefreshToken.for_user(user)  
-                refresh['role'] = user.role
-                refresh['email'] = user.email
-                refresh['first_name'] = user.first_name
-                refresh['last_name'] = user.last_name
+
+                refresh = RefreshToken.for_user(user)
+                refresh["role"] = user.role
+                refresh["email"] = user.email
+                refresh["first_name"] = user.first_name
+                refresh["last_name"] = user.last_name
                 data = {
-                        'refresh': str(refresh),
-                        'access': str(refresh.access_token),
-                    }   
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                }
                 return Response(data, status=status.HTTP_200_OK)
-            
-            return Response({
-                'message':"something went wrong",
-                'data':serializer.errors
-            },status=status.HTTP_400_BAD_REQUEST)  
+
+            return Response(
+                {"message": "something went wrong", "data": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         except Exception as e:
-            print(e)  
-
+            print(e)
 
 
 class StudentSignupAPI(APIView):
-    def post(self,request):
+    def post(self, request):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             user_data = serializer.validated_data
             # user = serializer.save()
             user = CustomUser(
-                first_name = user_data['first_name'],
-                last_name = user_data['last_name'],
-                email = 'student-' + user_data['email'],
-                phone_number = 'student-' + user_data['phone_number'],
-                role = 'student'
+                first_name=user_data["first_name"],
+                last_name=user_data["last_name"],
+                email="student-" + user_data["email"],
+                phone_number="student-" + user_data["phone_number"],
+                role="student",
             )
 
-            user.set_password(user_data['password'] )
+            user.set_password(user_data["password"])
             user.save()
 
             StudentProfile.objects.create(user=user)
-            return Response({'message':'Account created successfully.'},status=status.HTTP_201_CREATED)
+            return Response(
+                {"message": "Account created successfully."},
+                status=status.HTTP_201_CREATED,
+            )
         print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 class StudentProfileViewAndEdit(APIView):
     # permission_classes = [IsAuthenticated]
-    def get(self,request,user_id):
-        student_profile = get_object_or_404(StudentProfile,user=user_id)
+    def get(self, request, user_id):
+        student_profile = get_object_or_404(StudentProfile, user=user_id)
         print(student_profile.bio)
         serializer = StudentProfileSerializer(student_profile)
         print(serializer.data)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self,request,user_id):
+    def put(self, request, user_id):
         student_profile = get_object_or_404(StudentProfile, user=user_id)
         # print(student_profile)
         student_user = student_profile.user
         # print(student_user)
 
-        student_serializer = StudentListingSerializer(student_profile, data=request.data.get('student_profile'), partial=True)
-        user_serializer = CustomUserSerializer(student_user, data=request.data.get('user'), partial=True)
+        student_serializer = StudentListingSerializer(
+            student_profile, data=request.data.get("student_profile"), partial=True
+        )
+        user_serializer = CustomUserSerializer(
+            student_user, data=request.data.get("user"), partial=True
+        )
 
         if student_serializer.is_valid() and user_serializer.is_valid():
             student = student_serializer.save()
             user = user_serializer.save()
 
-            print('student-data----->',student.user.first_name,student.bio)
-            return Response({'message': 'Profile updated successfully',}, status=status.HTTP_200_OK)
-        
+            print("student-data----->", student.user.first_name, student.bio)
+            return Response(
+                {
+                    "message": "Profile updated successfully",
+                },
+                status=status.HTTP_200_OK,
+            )
+
         # Return errors if either serializer is invalid
         errors = {
-            "profile_errors": student_serializer.errors if not student_serializer.is_valid() else None,
-            "user_errors": user_serializer.errors if not user_serializer.is_valid() else None,
+            "profile_errors": student_serializer.errors
+            if not student_serializer.is_valid()
+            else None,
+            "user_errors": user_serializer.errors
+            if not user_serializer.is_valid()
+            else None,
         }
 
         return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 class InstructorProfileViewAndEdit(APIView):
     # permission_classes = [IsAuthenticated]
-    def get(self,request,user_id):
-        instructor_profile = get_object_or_404(InstructorProfile,user=user_id)
+    def get(self, request, user_id):
+        instructor_profile = get_object_or_404(InstructorProfile, user=user_id)
         print(instructor_profile.bio)
         serializer = InstructorProfileSerializer(instructor_profile)
         print(serializer.data)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self,request,user_id):
+    def put(self, request, user_id):
         instructor_profile = get_object_or_404(InstructorProfile, user=user_id)
         # print(student_profile)
         instructor_user = instructor_profile.user
         # print(student_user)
 
-        instructor_serializer = InstructorProfileSerializer(instructor_profile, data=request.data.get('instructor_profile'), partial=True)
-        user_serializer = CustomUserSerializer(instructor_user, data=request.data.get('user'), partial=True)
+        instructor_serializer = InstructorProfileSerializer(
+            instructor_profile,
+            data=request.data.get("instructor_profile"),
+            partial=True,
+        )
+        user_serializer = CustomUserSerializer(
+            instructor_user, data=request.data.get("user"), partial=True
+        )
 
         if instructor_serializer.is_valid() and user_serializer.is_valid():
             instructor = instructor_serializer.save()
             user = user_serializer.save()
             instructor.save()
             user.save()
-            user_data = {'first_name':user.first_name,'last_name':user.last_name}
-            instructor_data = {'state':instructor.state,'bio':instructor.bio}
+            user_data = {"first_name": user.first_name, "last_name": user.last_name}
+            instructor_data = {"state": instructor.state, "bio": instructor.bio}
 
-            print('student-data----->',instructor.user.first_name,instructor.bio)
-            return Response({'message': 'Profile updated successfully'}, status=status.HTTP_200_OK)
-        
+            print("student-data----->", instructor.user.first_name, instructor.bio)
+            return Response(
+                {"message": "Profile updated successfully"}, status=status.HTTP_200_OK
+            )
+
         # Return errors if either serializer is invalid
         errors = {
-            "profile_errors": instructor_serializer.errors if not instructor_serializer.is_valid() else None,
-            "user_errors": user_serializer.errors if not user_serializer.is_valid() else None,
+            "profile_errors": instructor_serializer.errors
+            if not instructor_serializer.is_valid()
+            else None,
+            "user_errors": user_serializer.errors
+            if not user_serializer.is_valid()
+            else None,
         }
 
         return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-    
 class InstructorSignupAPI(APIView):
-    def post(self,request):
+    def post(self, request):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             user_data = serializer.validated_data
             # user = serializer.save()
             user = CustomUser(
-                first_name = user_data['first_name'],
-                last_name = user_data['last_name'],
-                email = 'instructor-' + user_data['email'],
-                phone_number = 'instructor-' + user_data['phone_number'],
-                role = 'instructor'
+                first_name=user_data["first_name"],
+                last_name=user_data["last_name"],
+                email="instructor-" + user_data["email"],
+                phone_number="instructor-" + user_data["phone_number"],
+                role="instructor",
             )
-            user.set_password(user_data['password'] )
+            user.set_password(user_data["password"])
             # user.email = 'instructor-' + user_data['email']
             # user.phone_number = 'instructor-' + user_data['phone_number']
             # user.role = 'instructor'
             user.save()
 
             InstructorProfile.objects.create(user=user)
-            return Response({'message':'Account created successfully.'},status=status.HTTP_201_CREATED)
+            return Response(
+                {"message": "Account created successfully."},
+                status=status.HTTP_201_CREATED,
+            )
         print(serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-#Login View for student
+# Login View for student
 class InstructorLoginAPI(APIView):
-    def post(self,request):
+    def post(self, request):
         try:
             data = request.data
-            serializer = LoginSerializer(data = data)
+            serializer = LoginSerializer(data=data)
             if serializer.is_valid():
-                email = 'instructor-' + serializer.data['email']
-                password = serializer.data['password']
+                email = "instructor-" + serializer.data["email"]
+                password = serializer.data["password"]
 
-                user = authenticate(email=email,password=password)
+                user = authenticate(email=email, password=password)
 
-                if user is None or user.role != 'instructor':
+                if user is None or user.role != "instructor":
                     data = {
-                        'message': 'invalid credentials',
+                        "message": "invalid credentials",
                     }
                     return Response(data, status=status.HTTP_400_BAD_REQUEST)
-                
-                refresh = RefreshToken.for_user(user)  
-                refresh['role'] = user.role
-                refresh['email'] = user.email
-                refresh['first_name'] = user.first_name
-                refresh['last_name'] = user.last_name
+
+                refresh = RefreshToken.for_user(user)
+                refresh["role"] = user.role
+                refresh["email"] = user.email
+                refresh["first_name"] = user.first_name
+                refresh["last_name"] = user.last_name
 
                 instructor = InstructorProfile.objects.get(user=user)
                 serializer = InstructorProfileSerializer(instructor)
                 instructor_data = serializer.data
 
-
                 data = {
-                        'refresh': str(refresh),
-                        'access': str(refresh.access_token),
-                        # 'instructor_data':instructor_data,
-                        # 'email': str(user.email)
-                    }   
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                    # 'instructor_data':instructor_data,
+                    # 'email': str(user.email)
+                }
                 return Response(data, status=status.HTTP_200_OK)
-            
-            return Response({
-                'status':400,
-                'message':"something went wrong",
-                'data':serializer.errors
-            })  
+
+            return Response(
+                {
+                    "status": 400,
+                    "message": "something went wrong",
+                    "data": serializer.errors,
+                }
+            )
 
         except Exception as e:
-            print(e)        
+            print(e)
 
 
-
-#Login View for Admin
+# Login View for Admin
 class AdminLoginAPI(APIView):
-    def post(self,request):
+    def post(self, request):
         try:
             data = request.data
-            serializer = LoginSerializer(data = data)
+            serializer = LoginSerializer(data=data)
             if serializer.is_valid():
-                email = 'admin-' + serializer.data['email']
-                password = serializer.data['password']
+                email = "admin-" + serializer.data["email"]
+                password = serializer.data["password"]
 
-                user = authenticate(email=email,password=password)
+                user = authenticate(email=email, password=password)
 
-                if user is None or user.role != 'admin':
+                if user is None or user.role != "admin":
                     data = {
-                        'message': 'invalid credentials',
+                        "message": "invalid credentials",
                     }
                     return Response(data, status=status.HTTP_400_BAD_REQUEST)
-                
-                refresh = RefreshToken.for_user(user)  
-                refresh['role'] = user.role
-                refresh['email'] = user.email
-                refresh['first_name'] = user.first_name
+
+                refresh = RefreshToken.for_user(user)
+                refresh["role"] = user.role
+                refresh["email"] = user.email
+                refresh["first_name"] = user.first_name
                 data = {
-                        'refresh': str(refresh),
-                        'access': str(refresh.access_token),
-                        # 'email': str(user.email)
-                    }   
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                    # 'email': str(user.email)
+                }
                 return Response(data, status=status.HTTP_200_OK)
-            
-            return Response({
-                'status':400,
-                'message':"something went wrong",
-                'data':serializer.errors
-            })  
+
+            return Response(
+                {
+                    "status": 400,
+                    "message": "something went wrong",
+                    "data": serializer.errors,
+                }
+            )
 
         except Exception as e:
-            print(e)       
-
+            print(e)
 
 
 class AdminSignupAPI(APIView):
-    def post(self,request):
+    def post(self, request):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             user_data = serializer.validated_data
             user = serializer.save()
-            user.set_password(user_data['password'] )
-            user.email = 'admin-' + user_data['email']
-            user.phone_number = 'admin-' + user_data['phone_number']
-            user.role = 'admin'
+            user.set_password(user_data["password"])
+            user.email = "admin-" + user_data["email"]
+            user.phone_number = "admin-" + user_data["phone_number"]
+            user.role = "admin"
             user.save()
 
             AdminProfile.objects.create(user=user)
-            return Response({'message':'Account created successfully.'},status=status.HTTP_201_CREATED)
+            return Response(
+                {"message": "Account created successfully."},
+                status=status.HTTP_201_CREATED,
+            )
         print(serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
-
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AdminStudentListing(generics.ListCreateAPIView):
@@ -354,18 +390,16 @@ class AdminStudentListing(generics.ListCreateAPIView):
     permission_classes = [IsAdminUser]
 
 
-@api_view(['POST'])
-def block_unblock_user(request,user_id):
+@api_view(["POST"])
+def block_unblock_user(request, user_id):
     try:
-        student = CustomUser.objects.get(id=user_id, role='student')
+        student = CustomUser.objects.get(id=user_id, role="student")
         student.is_blocked = not student.is_blocked
         student.save()
         serializer = CustomUserSerializer(student)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     except CustomUser.DoesNotExist:
-        return Response({'detail': 'Student not found'}, status=status.HTTP_404_NOT_FOUND)
-
- 
-
-
+        return Response(
+            {"detail": "Student not found"}, status=status.HTTP_404_NOT_FOUND
+        )

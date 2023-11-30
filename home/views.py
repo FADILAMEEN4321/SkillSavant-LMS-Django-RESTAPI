@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import generics
-from course.models import Course,Category,SubCategory,Tags,FavouriteCourses
+from course.models import Course, Category, SubCategory, Tags, FavouriteCourses
 from .serializer import (
     CourseSerializerHome,
     CategorySubcategorySerializer,
@@ -15,22 +15,43 @@ from rest_framework.exceptions import NotFound
 from accounts.permissions import IsStudent
 
 
-
-
 class LastestCourseListingView(generics.ListAPIView):
-    queryset = Course.objects.filter(is_approved = True, unlisted = False).order_by('-created_at')[:5]
+    queryset = Course.objects.filter(is_approved=True, unlisted=False).order_by(
+        "-created_at"
+    )[:5]
     serializer_class = CourseSerializerHome
 
 
 class PopularCourseListingView(generics.ListAPIView):
-    queryset = Course.objects.filter(is_approved = True, unlisted = False)[:5]
+    queryset = Course.objects.filter(is_approved=True, unlisted=False)[:5]
     serializer_class = CourseSerializerHome
 
 
 class AllCourseListingView(generics.ListAPIView):
-    queryset = Course.objects.filter(is_approved = True, unlisted = False)
     serializer_class = CourseSerializerHome
 
+    def get_queryset(self):
+        # Initial queryset
+        queryset = Course.objects.filter(is_approved=True, unlisted=False)
+
+        # Category-wise selection
+        category = self.request.query_params.get("category", "")
+        if category:
+            queryset = queryset.filter(subcategory=category)
+
+        # Tag wise selection
+        tag = self.request.query_params.get("tag", "")
+        if tag:
+            queryset = queryset.filter(tags=tag)
+
+        # Level wise selection
+        level = self.request.query_params.get("level", "")
+        if level:
+            queryset = queryset.filter(level=level)
+
+        print(queryset)
+
+        return queryset
 
 
 class CategorySubcategoryListingView(generics.ListAPIView):
@@ -40,12 +61,12 @@ class CategorySubcategoryListingView(generics.ListAPIView):
 
 class TagsListingView(generics.ListAPIView):
     queryset = Tags.objects.all()
-    serializer_class = TagsSerializer  
+    serializer_class = TagsSerializer
 
 
 class CourseDetailView(generics.RetrieveAPIView):
     queryset = Course.objects.all()
-    serializer_class = CourseDetailSerializer   
+    serializer_class = CourseDetailSerializer
 
 
 class FavouriteCourseAddView(generics.CreateAPIView):
@@ -54,25 +75,22 @@ class FavouriteCourseAddView(generics.CreateAPIView):
     permission_classes = [IsStudent]
 
 
-
 class FavouriteCourseRemoveView(generics.DestroyAPIView):
     serializer_class = FavouriteCourseSerializer
     permission_classes = [IsStudent]
 
     def get_object(self):
-        course_id = self.kwargs.get('course_id')
-        student_id = self.kwargs.get('student_id')
-        
+        course_id = self.kwargs.get("course_id")
+        student_id = self.kwargs.get("student_id")
+
         favorite_course = FavouriteCourses.objects.filter(
-            course=course_id,
-            student = student_id
+            course=course_id, student=student_id
         ).first()
 
         if not favorite_course:
             raise NotFound("Favorite course not found")
 
         return favorite_course
-    
 
 
 class FavouriteCourseListingView(generics.ListAPIView):
@@ -80,10 +98,6 @@ class FavouriteCourseListingView(generics.ListAPIView):
     permission_classes = [IsStudent]
 
     def get_queryset(self):
-        student_id = self.kwargs.get('student_id')
+        student_id = self.kwargs.get("student_id")
         favourite_courses = FavouriteCourses.objects.filter(student=student_id)
         return favourite_courses
-    
-
-
-

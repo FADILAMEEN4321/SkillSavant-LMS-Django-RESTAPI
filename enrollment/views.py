@@ -4,52 +4,46 @@ from course.models import Course
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from accounts.models import StudentProfile
-from .models import EnrolledCourse
+from .models import EnrolledCourse, ModuleProgress
 from rest_framework import generics
 from .serializer import EnrolledCourseSerializer
 from accounts.permissions import IsStudent
 
 
-
 class VerifyCourseEnrollEligibility(APIView):
     permission_classes = [IsStudent]
 
-    def get(self,request, course_id, student_id):
-          try:
-            course = Course.objects.get(id = course_id)
-            student = StudentProfile.objects.get(id = student_id)
+    def get(self, request, course_id, student_id):
+        try:
+            course = Course.objects.get(id=course_id)
+            student = StudentProfile.objects.get(id=student_id)
 
-            if EnrolledCourse.objects.filter(course=course,student=student).exists():
-                response = {
-                    "message":"You are already enrolled in this course."
-                }
+            if EnrolledCourse.objects.filter(course=course, student=student).exists():
+                response = {"message": "You are already enrolled in this course."}
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
 
             if course.is_approved == True and course.unlisted == False:
                 response = {
-                    "message":"course is eligible for enrollment.course is approved and listed."
+                    "message": "course is eligible for enrollment.course is approved and listed."
                 }
                 return Response(response, status=status.HTTP_200_OK)
             else:
                 response = {
-                    "message":"sorry there is some issue regarding the enrollment of this course."
+                    "message": "sorry there is some issue regarding the enrollment of this course."
                 }
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-          except Course.DoesNotExist:
-               raise NotFound("Course not found")
-          except StudentProfile.DoesNotExist:
-              raise NotFound("Student not found.")
-          
-          except Exception as e:
+        except Course.DoesNotExist:
+            raise NotFound("Course not found")
+        except StudentProfile.DoesNotExist:
+            raise NotFound("Student not found.")
 
+        except Exception as e:
             response = {
                 "message": "An error occurred while verifying course eligibility.",
-                "error":e
+                "error": e,
             }
             return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
 
 
 class EnrolledCourseListView(generics.ListAPIView):
@@ -58,6 +52,22 @@ class EnrolledCourseListView(generics.ListAPIView):
     permission_classes = [IsStudent]
 
     def get_queryset(self):
-        return EnrolledCourse.objects.filter(student = self.request.user.studentprofile)             
+        return EnrolledCourse.objects.filter(student=self.request.user.studentprofile)
 
+
+class ModuleCompletionMarkingView(APIView):
+    def post(self, request):
+        module_id = request.data.get('module_id')
+        student_id = request.data.get('student_id')
+        if module_id is not None and student_id is not None:
+            try:
+                module_progress = ModuleProgress.objects.get(module=module_id,student=student_id)
+                module_progress.mark_as_completed()
+                return Response({"message": "Module marked as completed"}, status=status.HTTP_200_OK)
+
+            except ModuleProgress.DoesNotExist:
+                return Response({"error": "Module progress not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({"error": "Invalid data"}, status=status.HTTP_400_BAD_REQUEST)        
+            
 

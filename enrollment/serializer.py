@@ -13,8 +13,13 @@ class CourseSerializer(serializers.ModelSerializer):
 
 class EnrolledCourseSerializer(serializers.ModelSerializer):
     course = CourseSerializer()
+    completion_percentage = serializers.SerializerMethodField()
+
     class Meta:
         model = EnrolledCourse
         fields = '__all__'
+
+    def get_completion_percentage(self, enrolled_course):
+        return enrolled_course.completion_percentage()    
 
        
