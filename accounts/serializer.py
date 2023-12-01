@@ -13,7 +13,7 @@ class LoginSerializer(serializers.Serializer):
 class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ("email", "first_name", "last_name", "phone_number", "password")
+        fields = ["email", "first_name", "last_name", "password", "is_verified"]
         extra_kwargs = {"password": {"write_only": True}}
 
 
@@ -68,3 +68,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = "__all__"
+
+class VerfiyAccountSerializer(serializers.Serializer):
+    email = serializers.EmailField() 
+    otp = serializers.CharField()       

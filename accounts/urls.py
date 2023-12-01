@@ -6,6 +6,7 @@ urlpatterns = [
      path('student-login/',StudentLoginAPI.as_view()),
      path('student-profile-view-update/<int:user_id>/', StudentProfileViewAndEdit.as_view(), name='student-profile'),
      path('student-signup/', StudentSignupAPI.as_view(), name='student-signup'),
+     path('verify-student-otp/', VerifyStudentOTP.as_view(), name='verify-student-otp'),
 
 
      path('instructor-signup/', InstructorSignupAPI.as_view(), name='instructor-signup'),

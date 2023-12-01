@@ -15,7 +15,8 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ["username", "role"]
     role = models.CharField(max_length=10, choices=ROLES, default="student")
     is_blocked = models.BooleanField(default=False, blank=True, null=True)
-    phone_number = models.CharField(max_length=30, unique=True, blank=True, null=True)
+    is_verified = models.BooleanField(default=False, blank=True, null=True)
+    otp = models.CharField(max_length=6, null=True, blank=True)
 
     def formatted_student_email(self):
         email = self.email
