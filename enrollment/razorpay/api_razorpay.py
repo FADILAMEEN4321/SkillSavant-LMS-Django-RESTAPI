@@ -111,10 +111,10 @@ class EnrollmentCompletionAPIView(APIView):
                     ModuleProgress.objects.create(module=module, student=student)
 
                 # Sending email asynchronously using Celery
-                student_email = student.user.formatted_student_email()
-                send_enrollment_email.delay(
-                    student_email=student_email, course_title=course.title
-                )
+                # student_email = student.user.formatted_student_email()
+                # send_enrollment_email.delay(
+                #     student_email=student_email, course_title=course.title
+                # )
 
                 response = {"message": "Course Enrollment Successfull"}
 
