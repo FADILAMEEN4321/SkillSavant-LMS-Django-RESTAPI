@@ -218,7 +218,14 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Cors settings
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "https://skillsavant.netlify.app",
+    "https://www.skillsavant.netlify.app",
+    # "http://localhost:8080",
+    # "http://127.0.0.1:9000",
+]
 
 
 # Storage settings
