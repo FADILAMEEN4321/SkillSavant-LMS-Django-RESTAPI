@@ -57,17 +57,22 @@ class EnrolledCourseListView(generics.ListAPIView):
 
 class ModuleCompletionMarkingView(APIView):
     def post(self, request):
-        module_id = request.data.get('module_id')
-        student_id = request.data.get('student_id')
+        module_id = request.data.get("module_id")
+        student_id = request.data.get("student_id")
         if module_id is not None and student_id is not None:
             try:
-                module_progress = ModuleProgress.objects.get(module=module_id,student=student_id)
+                module_progress = ModuleProgress.objects.get(
+                    module=module_id, student=student_id
+                )
                 module_progress.mark_as_completed()
-                return Response({"message": "Module marked as completed"}, status=status.HTTP_200_OK)
+                return Response(
+                    {"message": "Module marked as completed"}, status=status.HTTP_200_OK
+                )
 
             except ModuleProgress.DoesNotExist:
-                return Response({"error": "Module progress not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response(
+                    {"error": "Module progress not found"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
-        return Response({"error": "Invalid data"}, status=status.HTTP_400_BAD_REQUEST)        
-            
-
+        return Response({"error": "Invalid data"}, status=status.HTTP_400_BAD_REQUEST)

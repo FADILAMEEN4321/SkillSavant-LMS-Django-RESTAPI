@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
+# Base user model for all type of users.
 class CustomUser(AbstractUser):
     ROLES = (
         ("student", "Student"),
@@ -29,6 +30,7 @@ class CustomUser(AbstractUser):
         return email
 
 
+# Model specific to student users.
 class StudentProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
@@ -39,11 +41,8 @@ class StudentProfile(models.Model):
     def __str__(self):
         return self.user.email
 
-    # def get_student_email(self):
-    #     email = self.user.email.formatted_student_email()
-    #     return email
 
-
+# Model specific to instructor users.
 class InstructorProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
@@ -57,6 +56,7 @@ class InstructorProfile(models.Model):
         return self.user.email
 
 
+# Model specific to admin users.
 class AdminProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     profile_photo = models.FileField(upload_to="admin_profiles/", blank=True, null=True)

@@ -5,16 +5,16 @@ from enrollment.models import EnrolledCourse
 
 @shared_task()
 def send_enrollment_email(student_email, course_title):
-    subject = 'Course Enrollment Successful'
-    message = f'Thank you for enrolling in {course_title}.'
-    from_email = 'your_email@example.com'
+    subject = "Course Enrollment Successful"
+    message = f"Thank you for enrolling in {course_title}."
+    from_email = "your_email@example.com"
     recipient_list = [student_email]
 
     try:
         send_mail(subject, message, from_email, recipient_list)
-        print('Email sent successfully.')
+        print("Email sent successfully.")
     except Exception as e:
-        print(f'An error occurred while sending the email: {e}') 
+        print(f"An error occurred while sending the email: {e}")
 
 
 @shared_task
@@ -24,9 +24,9 @@ def send_enrollment_emails_tasks():
         student_email = enrolled_course.student.user.formatted_student_email()
         course_title = enrolled_course.course.title
 
-        subject = 'Scheduled Course Update'
-        message = f'Update for {course_title}.'
-        from_email = 'your_email@example.com'
+        subject = "Scheduled Course Update"
+        message = f"Update for {course_title}."
+        from_email = "your_email@example.com"
         recipient_list = [student_email]
 
         send_mail(subject, message, from_email, recipient_list)

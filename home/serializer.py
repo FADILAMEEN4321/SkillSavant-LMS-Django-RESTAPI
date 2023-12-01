@@ -73,7 +73,7 @@ class ModuleSerializer(serializers.ModelSerializer):
                 return False
         return False
 
- 
+
 class CourseDetailSerializer(serializers.ModelSerializer):
     instructor_first_name = serializers.CharField(
         source="instructor.user.first_name", read_only=True
@@ -94,7 +94,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_duration(self, course):
-        return course.total_duration()    
+        return course.total_duration()
 
 
 class FavouriteCourseSerializer(serializers.ModelSerializer):

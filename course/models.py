@@ -1,7 +1,6 @@
 from django.db import models
-from accounts.models import InstructorProfile,StudentProfile
+from accounts.models import InstructorProfile, StudentProfile
 from datetime import timedelta
-
 
 
 class Category(models.Model):
@@ -10,17 +9,17 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 
 class SubCategory(models.Model):
     name = models.CharField(max_length=100)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE) 
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
-    
-    
+
+
 class Tags(models.Model):
     name = models.CharField(max_length=100)
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
@@ -28,13 +27,13 @@ class Tags(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 
 class Course(models.Model):
     LEVEL_CHOICES = [
-        ('Beginner','Beginner'),
-        ('Intermediate', 'Intermediate'),
-        ('Advanced', 'Advanced'),
+        ("Beginner", "Beginner"),
+        ("Intermediate", "Intermediate"),
+        ("Advanced", "Advanced"),
     ]
 
     title = models.CharField(max_length=100)
@@ -44,16 +43,16 @@ class Course(models.Model):
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tags)
     price = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
-    level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default='Beginner')
+    level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default="Beginner")
     is_approved = models.BooleanField(default=False)
     unlisted = models.BooleanField(default=False)
-    cover_image = models.FileField(upload_to='course_images/',null=True,blank=True)
+    cover_image = models.FileField(upload_to="course_images/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
-    
+
     def total_duration(self):
         total_duration = timedelta()
 
@@ -65,16 +64,16 @@ class Course(models.Model):
         minutes, seconds = divmod(remainder, 60)
 
         # Format the result
-        formatted_duration = "{:02}:{:02}:{:02}".format(int(hours), int(minutes), int(seconds))
+        formatted_duration = "{:02}:{:02}:{:02}".format(
+            int(hours), int(minutes), int(seconds)
+        )
         return formatted_duration
-
 
     def formatted_created_at(self):
         return self.created_at.strftime("%d-%m-%Y")
 
     class Meta:
-        ordering = ['created_at']    
-
+        ordering = ["created_at"]
 
 
 class Module(models.Model):
@@ -82,23 +81,20 @@ class Module(models.Model):
     duration = models.DurationField(default=timedelta(), null=True, blank=True)
     module_order = models.PositiveIntegerField()
     description = models.TextField(null=True, blank=True)
-    video_url = models.FileField(upload_to='module_videos/')
-    course = models.ForeignKey('Course', on_delete=models.CASCADE)
-    notes = models.FileField(upload_to='module_notes/', blank=True, null=True)
+    video_url = models.FileField(upload_to="module_videos/")
+    course = models.ForeignKey("Course", on_delete=models.CASCADE)
+    notes = models.FileField(upload_to="module_notes/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)  
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.module_title 
-    
-    class Meta:
-        ordering = ['module_order']
+        return self.module_title
 
+    class Meta:
+        ordering = ["module_order"]
 
 
 class FavouriteCourses(models.Model):
-    course = models.ForeignKey('Course', on_delete=models.CASCADE)
+    course = models.ForeignKey("Course", on_delete=models.CASCADE)
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now=True)
-
-

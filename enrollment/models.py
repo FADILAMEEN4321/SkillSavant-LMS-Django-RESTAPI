@@ -24,7 +24,7 @@ class EnrolledCourse(models.Model):
     def completion_percentage(self):
         modules_total = self.course.module_set.count()
         modules_completed = ModuleProgress.objects.filter(
-            student = self.student,
+            student=self.student,
             module__course=self.course,
             is_completed=True,
         ).count()
@@ -33,8 +33,7 @@ class EnrolledCourse(models.Model):
             return 0
 
         percentage = (modules_completed / modules_total) * 100
-        return round(percentage, 2)    
-
+        return round(percentage, 2)
 
 
 class Payment(models.Model):

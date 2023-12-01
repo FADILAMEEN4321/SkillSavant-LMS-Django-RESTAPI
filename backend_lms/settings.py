@@ -30,7 +30,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -60,7 +60,8 @@ INSTALLED_APPS = [
     'chat',
 ]
 
-#Manually added.
+
+# REST_FRAMEWORK settings.
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -68,7 +69,7 @@ REST_FRAMEWORK = {
 }
 
 
-
+# Simple JWT settings
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=90),
@@ -106,7 +107,7 @@ SIMPLE_JWT = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    #added manually
+    # Added manually
     "corsheaders.middleware.CorsMiddleware",
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -209,14 +210,14 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# USER MODEL FOR AUTHENTICATION
+# User model for authentication
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # The media root and URL
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-#added manually
+# Cors settings
 CORS_ALLOW_ALL_ORIGINS = True
 
 
@@ -230,33 +231,29 @@ AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET')
 AWS_QUERYSTRING_AUTH = False
 
 
-#Razorpay credentials
+# Razorpay credentials
 RAZOR_PAY_KEY_ID = os.getenv('RAZOR_PAY_KEY_ID')
 RAZOR_PAY_KEY_SECRET = os.getenv('RAZOR_PAY_KEY_SECRET')
 
 
-#OpenAI
+# OpenAI credentials
 OPENAI_API_KEY = os.getenv('OPENAI_API_SECRET_KEY')
-
 
 
 # Celery settings
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'django-db'
-# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Kolkata'
 
-#Celery Beat
-# CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+# Celery Beat
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 
-
-#Email configuration
+# Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

@@ -11,18 +11,16 @@ class CreateOrderSerializer(serializers.Serializer):
 class EnrolledCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = EnrolledCourse
-        fields = '__all__'
-   
+        fields = "__all__"
 
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Payment  
-        fields = '__all__'     
-
+        model = Payment
+        fields = "__all__"
 
 
 class TranscationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transcation
-        fields = '__all__'
+        fields = "__all__"

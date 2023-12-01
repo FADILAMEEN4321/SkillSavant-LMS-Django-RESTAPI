@@ -144,18 +144,17 @@ class ModuleView(APIView):
 
                 video_duration_seconds = int(video_clip.duration)
 
-                # Convert duration to timedelta
+                # Converting duration to timedelta
                 video_duration_timedelta = timedelta(seconds=video_duration_seconds)
 
-                video_clip.close()  # Explicitly close the video clip
-                os.remove(temp_video_path)  # Clean up the temporary file
+                video_clip.close()  # Explicitly closing the video clip
+                os.remove(temp_video_path)  # Cleaning up the temporary file
 
                 return video_duration_timedelta
             else:
                 raise ValueError("Unsupported file type")
 
         except Exception as e:
-            # Log the exception or handle it in a way that suits your application
             print(f"Error getting video duration: {e}")
             return timedelta()
 

@@ -24,7 +24,6 @@ class ModuleSerializer(serializers.ModelSerializer):
 
 
 class CourseAndModuleSerializer(serializers.ModelSerializer):
-    # modules = ModuleSerializer(many=True, read_only=True)
     formatted_created_at = serializers.SerializerMethodField()
 
     class Meta:

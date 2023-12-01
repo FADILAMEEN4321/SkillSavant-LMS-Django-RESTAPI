@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 from enrollment.models import Transcation
-from accounts.permissions import IsAdminUser,IsInstructor
+from accounts.permissions import IsAdminUser, IsInstructor
 
 
 class AdminInstructorListing(generics.ListCreateAPIView):
