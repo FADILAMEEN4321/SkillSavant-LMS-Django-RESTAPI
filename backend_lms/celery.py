@@ -24,7 +24,7 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.conf.beat_schedule = {
     'send-email-enrollment':{
         'task': 'enrollment.tasks.send_enrollment_emails_tasks',
-        'schedule': crontab(),
+        'schedule': crontab(hour=9, minute=0),
     }
 }
 
