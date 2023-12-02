@@ -11,7 +11,7 @@ def send_enrollment_email(student_email, course_title):
     recipient_list = [student_email]
 
     try:
-        send_mail(subject, message, from_email, recipient_list)
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True)
         print("Email sent successfully.")
     except Exception as e:
         print(f"An error occurred while sending the email: {e}")
@@ -24,9 +24,9 @@ def send_enrollment_emails_tasks():
         student_email = enrolled_course.student.user.formatted_student_email()
         course_title = enrolled_course.course.title
 
-        subject = "Scheduled Course Update"
-        message = f"Update for {course_title}."
+        subject = "Enrolled Course update."
+        message = f"See your progress for {course_title}."
         from_email = "your_email@example.com"
         recipient_list = [student_email]
 
-        send_mail(subject, message, from_email, recipient_list)
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True)
