@@ -19,4 +19,22 @@ def send_otp_via_email(email):
     print(user,'-----user')
     user.otp = otp
     user.save()
+    print(otp,'-----otp')
+
+def send_otp_via_email_to_instructor(email):
+    subject = "Your account verification email"
+    otp = random.randint(1000, 9999)
+    message = f'Your otp is {otp}'
+    send_mail(
+        subject=subject,
+        message=message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list = [email],
+        fail_silently=True,
+    )
+
+    user = CustomUser.objects.filter(email='instructor-' + email).first()
     print(user,'-----user')
+    user.otp = otp
+    user.save()
+    print(otp,'-----otp')

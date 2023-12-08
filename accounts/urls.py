@@ -10,6 +10,7 @@ urlpatterns = [
 
 
      path('instructor-signup/', InstructorSignupAPI.as_view(), name='instructor-signup'),
+     path('verify-instructor-otp', VerifyInstructorOTP.as_view(), name="verify-instructor-otp"),
      path('instructor-login/',InstructorLoginAPI.as_view(), name="instructor-login"),
      path('instructor-profile-view-update/<int:user_id>/', InstructorProfileViewAndEdit.as_view(), name='instructor-profile'),
 

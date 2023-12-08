@@ -12,7 +12,7 @@ from rest_framework.decorators import api_view
 import jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from .emails import send_otp_via_email
+from .emails import send_otp_via_email,send_otp_via_email_to_instructor
 
 
 class RefreshTokenView(APIView):
@@ -128,8 +128,16 @@ class StudentSignupAPI(APIView):
     def post(self, request):
         try:
             data = request.data
-            serializer = SignupSerializer(data = data)
+            serializer = SignupSerializer(data=data)
+
             if serializer.is_valid():
+                student_email = "student-" + serializer.data["email"]
+                print(student_email)
+                if CustomUser.objects.filter(email=student_email).exists():
+                    response = {
+                        "message": "Email Already registered. Login or resend otp to verify account."
+                    }
+                    return Response(response, status=status.HTTP_400_BAD_REQUEST)
                 user_data = serializer.validated_data
                 user = CustomUser(
                     first_name=user_data["first_name"],
@@ -139,112 +147,90 @@ class StudentSignupAPI(APIView):
                 )
                 user.set_password(user_data["password"])
                 user.save()
-                
+
                 # sending email and saving otp to user
-                send_otp_via_email(serializer.data['email'])
-                print('11111111')
+                send_otp_via_email(serializer.data["email"])
 
                 # Creating student profile.
                 StudentProfile.objects.create(user=user)
-                print('222222')
-                return Response({
-                    'status':200,
-                    'message':'registration successfull. Check email to verify account',
-                    'data': serializer.data,
-                }, status=status.HTTP_200_OK)
-            
-            return Response({
-                'status': 400,
-                'message': 'something went wrong.',
-                'data': serializer.errors,
-            })
-        
+
+                return Response(
+                    {
+                        "status": 200,
+                        "message": "registration successfull. Check email to verify account",
+                        "data": serializer.data,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+
+            return Response(
+                {
+                    "status": 400,
+                    "message": "something went wrong.",
+                    "data": serializer.errors,
+                }
+            )
+
         except Exception as e:
             print(e)
-            return Response({
-                'status':400,
-                'message':f"{e}"
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                {"status": 400, "message": f"{e}"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
 
 class VerifyStudentOTP(APIView):
     def post(self, request):
         try:
             data = request.data
-            serializer = VerfiyAccountSerializer(data = data)
+            serializer = VerfiyAccountSerializer(data=data)
 
             if serializer.is_valid():
-                email =  'student-' + serializer.data['email']
-                otp = serializer.data['otp']
+                email = "student-" + serializer.data["email"]
+                otp = serializer.data["otp"]
 
-                user = CustomUser.objects.filter(email = email)
+                user = CustomUser.objects.filter(email=email)
                 if not user.exists():
-                    return Response({
-                        'status': 400,
-                        'message':'something went wrong.',
-                        'data': 'invalid email'
-                    }, status=status.HTTP_400_BAD_REQUEST)
-                
+                    return Response(
+                        {
+                            "status": 400,
+                            "message": "something went wrong.",
+                            "data": "invalid email",
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
                 if not user[0].otp == otp:
-                    return Response({
-                        'status': 400,
-                        'message':'something went wrong.',
-                        'data': 'invalid otp'
-                    }, status=status.HTTP_400_BAD_REQUEST)
-                 
+                    return Response(
+                        {
+                            "status": 400,
+                            "message": "something went wrong.",
+                            "data": "invalid otp",
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
                 user = user.first()
                 user.is_verified = True
                 user.save()
-                
-                return Response({
-                        'status': 200,
-                        'message':'Account verified.',
-                        'data': {},
-                    }, status=status.HTTP_200_OK) 
-            
+
+                return Response(
+                    {
+                        "status": 200,
+                        "message": "Account verified.",
+                        "data": {},
+                    },
+                    status=status.HTTP_200_OK,
+                )
+
         except Exception as e:
             print(e)
-            return Response({
-                'status':400,
-                'message':f"{e}"
-            }, status=status.HTTP_400_BAD_REQUEST)    
+            return Response(
+                {"status": 400, "message": f"{e}"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
-
-
-
-
-
-
-
-
-
-# class StudentSignupAPI(APIView):
-#     def post(self, request):
-#         serializer = SignupSerializer(data=request.data)
-#         if serializer.is_valid():
-#             user_data = serializer.validated_data
-#             # user = serializer.save()
-#             user = CustomUser(
-#                 first_name=user_data["first_name"],
-#                 last_name=user_data["last_name"],
-#                 email="student-" + user_data["email"],
-#                 role="student",
-#             )
-
-#             user.set_password(user_data["password"])
-#             user.save()
-
-#             StudentProfile.objects.create(user=user)
-#             return Response(
-#                 {"message": "Account created successfully."},
-#                 status=status.HTTP_201_CREATED,
-#             )
-#         print(serializer.errors)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class StudentProfileViewAndEdit(APIView):
-    # permission_classes = [IsAuthenticated]
     def get(self, request, user_id):
         student_profile = get_object_or_404(StudentProfile, user=user_id)
         print(student_profile.bio)
@@ -254,9 +240,7 @@ class StudentProfileViewAndEdit(APIView):
 
     def put(self, request, user_id):
         student_profile = get_object_or_404(StudentProfile, user=user_id)
-        # print(student_profile)
         student_user = student_profile.user
-        # print(student_user)
 
         student_serializer = StudentListingSerializer(
             student_profile, data=request.data.get("student_profile"), partial=True
@@ -291,7 +275,6 @@ class StudentProfileViewAndEdit(APIView):
 
 
 class InstructorProfileViewAndEdit(APIView):
-    # permission_classes = [IsAuthenticated]
     def get(self, request, user_id):
         instructor_profile = get_object_or_404(InstructorProfile, user=user_id)
         print(instructor_profile.bio)
@@ -301,9 +284,7 @@ class InstructorProfileViewAndEdit(APIView):
 
     def put(self, request, user_id):
         instructor_profile = get_object_or_404(InstructorProfile, user=user_id)
-        # print(student_profile)
         instructor_user = instructor_profile.user
-        # print(student_user)
 
         instructor_serializer = InstructorProfileSerializer(
             instructor_profile,
@@ -338,34 +319,141 @@ class InstructorProfileViewAndEdit(APIView):
         }
 
         return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 
 class InstructorSignupAPI(APIView):
     def post(self, request):
-        serializer = SignupSerializer(data=request.data)
-        if serializer.is_valid():
-            user_data = serializer.validated_data
-            # user = serializer.save()
-            user = CustomUser(
-                first_name=user_data["first_name"],
-                last_name=user_data["last_name"],
-                email="instructor-" + user_data["email"],
-                phone_number="instructor-" + user_data["phone_number"],
-                role="instructor",
-            )
-            user.set_password(user_data["password"])
-            # user.email = 'instructor-' + user_data['email']
-            # user.phone_number = 'instructor-' + user_data['phone_number']
-            # user.role = 'instructor'
-            user.save()
+        try:
+            data = request.data
+            serializer = SignupSerializer(data=data)
 
-            InstructorProfile.objects.create(user=user)
+            if serializer.is_valid():
+                instructor_email = "instructor-" + serializer.data["email"]
+                print(instructor_email)
+                if CustomUser.objects.filter(email=instructor_email).exists():
+                    response = {
+                        "message": "Email Already registered. Login or resend otp to verify account."
+                    }
+                    return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                user_data = serializer.validated_data
+                user = CustomUser(
+                    first_name=user_data["first_name"],
+                    last_name=user_data["last_name"],
+                    email="instructor-" + user_data["email"],
+                    role="instructor",
+                )
+                user.set_password(user_data["password"])
+                user.save()
+
+                # sending email and saving otp to user
+                send_otp_via_email_to_instructor(serializer.data["email"])
+
+                # Creating student profile.
+                InstructorProfile.objects.create(user=user)
+
+                return Response(
+                    {
+                        "status": 200,
+                        "message": "registration successfull. Check email to verify account",
+                        "data": serializer.data,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+
             return Response(
-                {"message": "Account created successfully."},
-                status=status.HTTP_201_CREATED,
+                {
+                    "status": 400,
+                    "message": "something went wrong.",
+                    "data": serializer.errors,
+                }
             )
-        print(serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            print(e)
+            return Response(
+                {"status": 400, "message": f"{e}"}, status=status.HTTP_400_BAD_REQUEST
+            )    
+        
+
+class VerifyInstructorOTP(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            serializer = VerfiyAccountSerializer(data=data)
+
+            if serializer.is_valid():
+                email = "instructor-" + serializer.data["email"]
+                otp = serializer.data["otp"]
+
+                user = CustomUser.objects.filter(email=email)
+                if not user.exists():
+                    return Response(
+                        {
+                            "status": 400,
+                            "message": "something went wrong.",
+                            "data": "invalid email",
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                if not user[0].otp == otp:
+                    return Response(
+                        {
+                            "status": 400,
+                            "message": "something went wrong.",
+                            "data": "invalid otp",
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                user = user.first()
+                user.is_verified = True
+                user.save()
+
+                return Response(
+                    {
+                        "status": 200,
+                        "message": "Account verified.",
+                        "data": {},
+                    },
+                    status=status.HTTP_200_OK,
+                )
+
+        except Exception as e:
+            print(e)
+            return Response(
+                {"status": 400, "message": f"{e}"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+
+# class InstructorSignupAPI(APIView):
+#     def post(self, request):
+#         serializer = SignupSerializer(data=request.data)
+#         if serializer.is_valid():
+#             user_data = serializer.validated_data
+#             # user = serializer.save()
+#             user = CustomUser(
+#                 first_name=user_data["first_name"],
+#                 last_name=user_data["last_name"],
+#                 email="instructor-" + user_data["email"],
+#                 phone_number="instructor-" + user_data["phone_number"],
+#                 role="instructor",
+#             )
+#             user.set_password(user_data["password"])
+#             # user.email = 'instructor-' + user_data['email']
+#             # user.phone_number = 'instructor-' + user_data['phone_number']
+#             # user.role = 'instructor'
+#             user.save()
+
+#             InstructorProfile.objects.create(user=user)
+#             return Response(
+#                 {"message": "Account created successfully."},
+#                 status=status.HTTP_201_CREATED,
+#             )
+#         print(serializer.errors)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Login View for student
