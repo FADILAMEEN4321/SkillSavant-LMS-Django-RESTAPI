@@ -91,7 +91,12 @@ class EnrollmentCompletionAPIView(APIView):
                 and payment_serializer.is_valid()
                 and transcation_serializer.is_valid()
             ):
-                rz_client.verify_payment(
+                print(transcation_serializer.validated_data["order_id"])
+                print(transcation_serializer.validated_data[
+                        "payment_id"
+                    ],)
+                print(transcation_serializer.validated_data["order_id"])
+                test = rz_client.verify_payment(
                     razorpay_order_id=transcation_serializer.validated_data["order_id"],
                     razorpay_payment_id=transcation_serializer.validated_data[
                         "payment_id"
@@ -100,6 +105,7 @@ class EnrollmentCompletionAPIView(APIView):
                         "signature"
                     ],
                 )
+                print(test,'----->test')
 
                 enroll_course_serializer.save()
                 payment_serializer.save()

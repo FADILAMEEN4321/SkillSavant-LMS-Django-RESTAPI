@@ -17,6 +17,7 @@ class RazorpayClient:
     def verify_payment(
         self, razorpay_order_id, razorpay_payment_id, razorpay_signature
     ):
+        print(razorpay_order_id, razorpay_payment_id, razorpay_signature)
         try:
             return client.utility.verify_payment_signature(
                 {

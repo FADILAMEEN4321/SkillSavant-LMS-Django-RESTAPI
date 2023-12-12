@@ -94,9 +94,15 @@ class StudentLoginAPI(APIView):
 
                 if user is None or user.role != "student":
                     data = {
-                        "message": "invalid credentials",
+                        "message": "Invalid credentials",
                     }
                     return Response(data, status=status.HTTP_400_BAD_REQUEST)
+                
+                if not user.is_verified:
+                    data = {
+                        'message':'Please verify your account.'
+                    }
+                    return Response(data,status=status.HTTP_400_BAD_REQUEST)
 
                 if user.is_blocked:
                     data = {
@@ -331,6 +337,7 @@ class InstructorSignupAPI(APIView):
             if serializer.is_valid():
                 instructor_email = "instructor-" + serializer.data["email"]
                 print(instructor_email)
+
                 if CustomUser.objects.filter(email=instructor_email).exists():
                     response = {
                         "message": "Email Already registered. Login or resend otp to verify account."
@@ -427,33 +434,6 @@ class VerifyInstructorOTP(APIView):
             )
 
 
-
-# class InstructorSignupAPI(APIView):
-#     def post(self, request):
-#         serializer = SignupSerializer(data=request.data)
-#         if serializer.is_valid():
-#             user_data = serializer.validated_data
-#             # user = serializer.save()
-#             user = CustomUser(
-#                 first_name=user_data["first_name"],
-#                 last_name=user_data["last_name"],
-#                 email="instructor-" + user_data["email"],
-#                 phone_number="instructor-" + user_data["phone_number"],
-#                 role="instructor",
-#             )
-#             user.set_password(user_data["password"])
-#             # user.email = 'instructor-' + user_data['email']
-#             # user.phone_number = 'instructor-' + user_data['phone_number']
-#             # user.role = 'instructor'
-#             user.save()
-
-#             InstructorProfile.objects.create(user=user)
-#             return Response(
-#                 {"message": "Account created successfully."},
-#                 status=status.HTTP_201_CREATED,
-#             )
-#         print(serializer.errors)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Login View for student
