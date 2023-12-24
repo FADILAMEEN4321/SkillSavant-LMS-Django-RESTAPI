@@ -113,7 +113,11 @@ class ModuleView(APIView):
                 duration = self.get_video_duration(video_url)
                 serializer.validated_data["duration"] = duration
 
-                serializer.save()
+                module = serializer.save()
+
+                
+
+
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

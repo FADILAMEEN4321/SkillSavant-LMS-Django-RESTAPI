@@ -81,6 +81,7 @@ class Module(models.Model):
     duration = models.DurationField(default=timedelta(), null=True, blank=True)
     module_order = models.PositiveIntegerField()
     description = models.TextField(null=True, blank=True)
+    transcript = models.TextField(null=True, blank=True)
     video_url = models.FileField(upload_to="module_videos/")
     course = models.ForeignKey("Course", on_delete=models.CASCADE)
     notes = models.FileField(upload_to="module_notes/", blank=True, null=True)

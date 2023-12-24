@@ -38,6 +38,7 @@ class TagsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tags
         fields = "__all__"
+        ref_name = 'AdminTags'
 
 
 class CourseSerializerAdmin(serializers.ModelSerializer):

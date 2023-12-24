@@ -13,6 +13,7 @@ import jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from .emails import send_otp_via_email,send_otp_via_email_to_instructor
+from drf_yasg.utils import swagger_auto_schema
 
 
 class RefreshTokenView(APIView):
@@ -82,7 +83,26 @@ class RefreshTokenView(APIView):
 
 # Login View for student
 class StudentLoginAPI(APIView):
+    """
+    API endpoint for student login.
+    """
+    @swagger_auto_schema(
+        request_body=LoginSerializer,
+        responses={
+            200: "Authentication successful",
+            400: "Invalid credentials or invalid data",
+            403: "Account blocked or verification pending",
+            500: "Internal server error",
+        },
+    )
     def post(self, request):
+        """
+        Handle POST requests for student login.
+
+        :param request: The incoming request object.
+        :return: JSON response with authentication tokens or error message.
+        """
+
         try:
             data = request.data
             serializer = LoginSerializer(data=data)
@@ -128,10 +148,31 @@ class StudentLoginAPI(APIView):
 
         except Exception as e:
             print(e)
+            return Response(
+                {"message": "Internal server error"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class StudentSignupAPI(APIView):
+    """
+    API endpoint for student signup.
+    """
+    @swagger_auto_schema(
+        request_body=SignupSerializer,
+        responses={
+            200: "Registration successful",
+            400: "Invalid data or email already registered",
+            400: "Internal server error",
+        },
+    )
     def post(self, request):
+        """
+        Handle POST requests for student signup.
+
+        :param request: The incoming request object.
+        :return: JSON response with registration status or error message.
+        """
         try:
             data = request.data
             serializer = SignupSerializer(data=data)
@@ -436,9 +477,27 @@ class VerifyInstructorOTP(APIView):
 
 
 
-# Login View for student
+
 class InstructorLoginAPI(APIView):
+    """
+    API endpoint for instructor login.
+    """
+
+    @swagger_auto_schema(
+        request_body=LoginSerializer,
+        responses={
+            200: "Authentication successful",
+            400: "Invalid credentials or invalid data",
+            500: "Internal server error",
+        },
+    )
     def post(self, request):
+        """
+        Handle POST requests for instructor login.
+
+        :param request: The incoming request object.
+        :return: JSON response with authentication tokens or error message.
+        """
         try:
             data = request.data
             serializer = LoginSerializer(data=data)
@@ -482,6 +541,13 @@ class InstructorLoginAPI(APIView):
 
         except Exception as e:
             print(e)
+            return Response(
+                {
+                    "status": 500,
+                    "message": "Internal server error",
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 # Login View for Admin

@@ -35,6 +35,7 @@ class TagsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tags
         fields = "__all__"
+        ref_name = 'HomeTags'
 
 
 class SubcategorySerializer(serializers.ModelSerializer):
