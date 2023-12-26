@@ -13,12 +13,22 @@ import io
 import os
 import tempfile
 from datetime import timedelta
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 class CourseView(APIView):
     permission_classes = [IsInstructor]
 
+    @swagger_auto_schema(
+        request_body=CourseSerializer,
+        responses={201: CourseSerializer(), 400: "Bad Request"},
+    )
     def post(self, request):
+        """
+        Create a new course.
+
+        """
         try:
             serializer = CourseSerializer(data=request.data)
             print(request.data)
@@ -43,7 +53,26 @@ class CourseView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                name="instructor_id",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description="ID of the instructor",
+            ),
+        ],
+        responses={
+            200: CourseSerializer(many=True),
+            404: "Not Found",
+            500: "Internal Server Error",
+        },
+    )
     def get(self, request, instructor_id):
+        """
+        Retrieve courses for a specific instructor.
+
+        """
         try:
             courses = Course.objects.filter(instructor=instructor_id, unlisted=False)
             serializer = CourseSerializer(courses, many=True)
@@ -91,10 +120,26 @@ class UnlistCourseView(APIView):
 
 
 class ModuleView(APIView):
+    """
+    API endpoint for creating a module.
+    """
+
+    @swagger_auto_schema(
+        request_body=ModuleSerializer,
+        responses={
+            201: "Module created successfully",
+            400: "Bad request. Check the error details for more information.",
+            500: "Internal server error",
+        },
+    )
     def post(
         self,
         request,
     ):
+        """
+        Handle POST requests for creating a module.
+
+        """
         try:
             serializer = ModuleSerializer(data=request.data)
 
@@ -114,9 +159,6 @@ class ModuleView(APIView):
                 serializer.validated_data["duration"] = duration
 
                 module = serializer.save()
-
-                
-
 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 

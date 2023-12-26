@@ -8,6 +8,8 @@ from .models import EnrolledCourse, ModuleProgress
 from rest_framework import generics
 from .serializer import EnrolledCourseSerializer
 from accounts.permissions import IsStudent
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 class VerifyCourseEnrollEligibility(APIView):
@@ -56,7 +58,30 @@ class EnrolledCourseListView(generics.ListAPIView):
 
 
 class ModuleCompletionMarkingView(APIView):
+    """
+    API endpoint for marking a module as completed.
+    """
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "module_id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                "student_id": openapi.Schema(type=openapi.TYPE_INTEGER),
+            },
+            required=["module_id", "student_id"],
+        ),
+        responses={
+            200: "Module marked as completed",
+            400: "Bad request. Invalid data provided.",
+            404: "Module progress not found",
+        },
+    )
     def post(self, request):
+        """
+        Handle POST requests for marking a module as completed.
+
+        """
         module_id = request.data.get("module_id")
         student_id = request.data.get("student_id")
         if module_id is not None and student_id is not None:

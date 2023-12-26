@@ -12,11 +12,34 @@ from rest_framework.decorators import api_view
 import jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from .emails import send_otp_via_email,send_otp_via_email_to_instructor
+from .emails import send_otp_via_email, send_otp_via_email_to_instructor
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 class RefreshTokenView(APIView):
+    """
+    API endpoint for refreshing access tokens.
+    """
+
+    @swagger_auto_schema(
+        request_body=None,
+        responses={
+            200: "New refresh and access tokens generated successfully.",
+            400: "No valid refresh token provided, or invalid refresh token.",
+            401: "Refresh token has expired.",
+            404: "User associated with the refresh token does not exist.",
+        },
+        manual_parameters=[
+            openapi.Parameter(
+                name="Authorization",
+                in_=openapi.IN_HEADER,
+                type=openapi.TYPE_STRING,
+                description="Bearer <refresh_token>",
+                required=True,
+            ),
+        ],
+    )
     def post(self, request):
         try:
             # Check if the request contains a valid refresh token
@@ -86,6 +109,7 @@ class StudentLoginAPI(APIView):
     """
     API endpoint for student login.
     """
+
     @swagger_auto_schema(
         request_body=LoginSerializer,
         responses={
@@ -99,8 +123,7 @@ class StudentLoginAPI(APIView):
         """
         Handle POST requests for student login.
 
-        :param request: The incoming request object.
-        :return: JSON response with authentication tokens or error message.
+
         """
 
         try:
@@ -117,12 +140,10 @@ class StudentLoginAPI(APIView):
                         "message": "Invalid credentials",
                     }
                     return Response(data, status=status.HTTP_400_BAD_REQUEST)
-                
+
                 if not user.is_verified:
-                    data = {
-                        'message':'Please verify your account.'
-                    }
-                    return Response(data,status=status.HTTP_400_BAD_REQUEST)
+                    data = {"message": "Please verify your account."}
+                    return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
                 if user.is_blocked:
                     data = {
@@ -158,6 +179,7 @@ class StudentSignupAPI(APIView):
     """
     API endpoint for student signup.
     """
+
     @swagger_auto_schema(
         request_body=SignupSerializer,
         responses={
@@ -170,8 +192,6 @@ class StudentSignupAPI(APIView):
         """
         Handle POST requests for student signup.
 
-        :param request: The incoming request object.
-        :return: JSON response with registration status or error message.
         """
         try:
             data = request.data
@@ -226,7 +246,21 @@ class StudentSignupAPI(APIView):
 
 
 class VerifyStudentOTP(APIView):
+    """
+    API endpoint for verifying student OTP.
+    """
+
+    @swagger_auto_schema(
+        request_body=VerfiyAccountSerializer,
+        responses={
+            200: "Account verified successfully",
+            400: "Invalid email or OTP, or something went wrong",
+        },
+    )
     def post(self, request):
+        """
+        Handle POST requests for verifying student OTP.
+        """
         try:
             data = request.data
             serializer = VerfiyAccountSerializer(data=data)
@@ -274,7 +308,6 @@ class VerifyStudentOTP(APIView):
             return Response(
                 {"status": 400, "message": f"{e}"}, status=status.HTTP_400_BAD_REQUEST
             )
-
 
 
 class StudentProfileViewAndEdit(APIView):
@@ -366,11 +399,25 @@ class InstructorProfileViewAndEdit(APIView):
         }
 
         return Response(errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
 
 class InstructorSignupAPI(APIView):
+    """
+    API endpoint for instructor registration.
+    """
+
+    @swagger_auto_schema(
+        request_body=SignupSerializer,
+        responses={
+            200: "Registration successful. Check email to verify account",
+            400: "Email already registered, or something went wrong",
+        },
+    )
     def post(self, request):
+        """
+        Handle POST requests for instructor registration.
+
+        """
         try:
             data = request.data
             serializer = SignupSerializer(data=data)
@@ -421,11 +468,26 @@ class InstructorSignupAPI(APIView):
             print(e)
             return Response(
                 {"status": 400, "message": f"{e}"}, status=status.HTTP_400_BAD_REQUEST
-            )    
-        
+            )
+
 
 class VerifyInstructorOTP(APIView):
+    """
+    API endpoint for verifying instructor OTP.
+    """
+
+    @swagger_auto_schema(
+        request_body=VerfiyAccountSerializer,
+        responses={
+            200: "Account verified successfully",
+            400: "Invalid email or OTP, or something went wrong",
+        },
+    )
     def post(self, request):
+        """
+        Handle POST requests for verifying instructor OTP.
+
+        """
         try:
             data = request.data
             serializer = VerfiyAccountSerializer(data=data)
@@ -475,9 +537,6 @@ class VerifyInstructorOTP(APIView):
             )
 
 
-
-
-
 class InstructorLoginAPI(APIView):
     """
     API endpoint for instructor login.
@@ -495,8 +554,6 @@ class InstructorLoginAPI(APIView):
         """
         Handle POST requests for instructor login.
 
-        :param request: The incoming request object.
-        :return: JSON response with authentication tokens or error message.
         """
         try:
             data = request.data
@@ -546,13 +603,24 @@ class InstructorLoginAPI(APIView):
                     "status": 500,
                     "message": "Internal server error",
                 },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
 
 # Login View for Admin
 class AdminLoginAPI(APIView):
+    @swagger_auto_schema(
+        request_body=LoginSerializer,
+        responses={
+            200: "Login successful. Returns a JSON with refresh and access tokens.",
+            400: "Invalid credentials. Returns a JSON with an error message.",
+        },
+    )
     def post(self, request):
+        """
+        Handle POST requests for admin login.
+
+        """
         try:
             data = request.data
             serializer = LoginSerializer(data=data)

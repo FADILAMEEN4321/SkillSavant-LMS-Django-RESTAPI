@@ -14,6 +14,7 @@ from enrollment.models import Transcation, Payment, EnrolledCourse, ModuleProgre
 from rest_framework.serializers import ValidationError
 from decimal import Decimal
 from enrollment.tasks import send_enrollment_email
+from drf_yasg.utils import swagger_auto_schema
 
 
 # Object for razorpay client
@@ -21,7 +22,21 @@ rz_client = RazorpayClient()
 
 
 class CreateOrderAPIView(APIView):
+    """
+    API endpoint for creating a Razorpay payment order.
+    """
+    @swagger_auto_schema(
+        request_body=CreateOrderSerializer,
+        responses={
+            201: "Razorpay payment order created",
+            400: "Bad request. Check the error details for more information.",
+        },
+    )
     def post(self, request):
+        """
+        Handle POST requests for creating a Razorpay payment order.
+
+        """
         create_order_serializer = CreateOrderSerializer(data=request.data)
 
         if create_order_serializer.is_valid():
@@ -45,7 +60,22 @@ class CreateOrderAPIView(APIView):
 
 
 class EnrollmentCompletionAPIView(APIView):
+    """
+    API endpoint for completing course enrollment and payment.
+    """
+    @swagger_auto_schema(
+        request_body=EnrolledCourseSerializer,
+        responses={
+            201: "Course Enrollment Successful",
+            400: "Bad request. Check the error details for more information.",
+        },
+    )
+
     def post(self, request):
+        """
+        Handle POST requests for completing course enrollment and payment.
+
+        """
         try:
             # All data required
             course = Course.objects.get(id=request.data["course"])

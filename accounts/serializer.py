@@ -69,6 +69,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = "__all__"
 
+
 class VerfiyAccountSerializer(serializers.Serializer):
-    email = serializers.EmailField() 
-    otp = serializers.CharField()       
+    email = serializers.EmailField()
+    otp = serializers.CharField()

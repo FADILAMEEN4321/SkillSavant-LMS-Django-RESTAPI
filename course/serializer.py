@@ -9,6 +9,7 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = "__all__"
+        ref_name = "course_creation"
 
     def get_duration(self, obj):
         return obj.total_duration()
@@ -21,6 +22,7 @@ class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
         fields = "__all__"
+        ref_name = "module_create"
 
 
 class CourseAndModuleSerializer(serializers.ModelSerializer):

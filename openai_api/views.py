@@ -4,12 +4,40 @@ from django.conf import settings
 from rest_framework import status
 from openai import OpenAI
 from .prompts import assemble_prompt
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 openAI_client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 
 class LearningPathCreationApi(APIView):
+    """
+    API endpoint for creating a learning path.
+    """
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "course": openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description="The course for which the learning path needs to be generated.",
+                ),
+            },
+            required=["course"],
+        ),
+        responses={
+            200: "Successfully generated learning path",
+            500: "Internal server error while generating learning path",
+        },
+    )
     def post(self, request):
+        """
+        Handle POST requests for creating a learning path.
+
+        :param request: The incoming request object.
+        :return: JSON response with the generated learning path or error message.
+        """
         try:
             course = request.data["course"]
 

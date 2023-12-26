@@ -12,6 +12,7 @@ class EnrolledCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = EnrolledCourse
         fields = "__all__"
+        ref_name = 'enrollment_completion'
 
 
 class PaymentSerializer(serializers.ModelSerializer):
