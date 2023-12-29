@@ -138,7 +138,7 @@ TEMPLATES = [
 ]
 
 
-WSGI_APPLICATION = 'backend_lms.wsgi.application'
+# WSGI_APPLICATION = 'backend_lms.wsgi.application'
 ASGI_APPLICATION = 'backend_lms.routing.application'
 
 
