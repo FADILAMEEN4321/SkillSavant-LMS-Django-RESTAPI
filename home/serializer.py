@@ -4,31 +4,7 @@ from accounts.models import StudentProfile
 from enrollment.models import ModuleProgress
 
 
-class CourseSerializerHome(serializers.ModelSerializer):
-    instructor_first_name = serializers.CharField(
-        source="instructor.user.first_name", read_only=True
-    )
-    instructor_last_name = serializers.CharField(
-        source="instructor.user.last_name", read_only=True
-    )
-    is_favourite = serializers.SerializerMethodField()
-    duration = serializers.SerializerMethodField()
 
-    class Meta:
-        model = Course
-        fields = "__all__"
-        depth = 1
-
-    def get_is_favourite(self, obj):
-        request = self.context.get("request")
-        if request and request.user.is_authenticated:
-            user = request.user
-            student = StudentProfile.objects.get(user=user)
-            return FavouriteCourses.objects.filter(student=student, course=obj).exists()
-        return False
-
-    def get_duration(self, obj):
-        return obj.total_duration()
 
 
 class TagsSerializer(serializers.ModelSerializer):
@@ -73,6 +49,33 @@ class ModuleSerializer(serializers.ModelSerializer):
             except ModuleProgress.DoesNotExist:
                 return False
         return False
+
+class CourseSerializerHome(serializers.ModelSerializer):
+    instructor_first_name = serializers.CharField(
+        source="instructor.user.first_name", read_only=True
+    )
+    instructor_last_name = serializers.CharField(
+        source="instructor.user.last_name", read_only=True
+    )
+    is_favourite = serializers.SerializerMethodField()
+    duration = serializers.SerializerMethodField()
+    modules = ModuleSerializer(many=True, read_only=True, source='module_set')
+
+    class Meta:
+        model = Course
+        fields = "__all__"
+        depth = 1
+
+    def get_is_favourite(self, obj):
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            user = request.user
+            student = StudentProfile.objects.get(user=user)
+            return FavouriteCourses.objects.filter(student=student, course=obj).exists()
+        return False
+
+    def get_duration(self, obj):
+        return obj.total_duration()
 
 
 class CourseDetailSerializer(serializers.ModelSerializer):
