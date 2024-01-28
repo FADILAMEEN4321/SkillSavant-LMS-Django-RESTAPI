@@ -58,3 +58,7 @@ class LearningPathCreationApi(APIView):
                 f"{e}:Error generating learning path",
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+
+

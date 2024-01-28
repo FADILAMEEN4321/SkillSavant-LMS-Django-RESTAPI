@@ -23,5 +23,6 @@ def assemble_prompt(course):
     messages = [
         {"role": "system", "content": LEARNING_PATH_SYSTEM_PROMPT},
         {"role": "user", "content": USER_PROMPT},
+
     ]
     return messages
