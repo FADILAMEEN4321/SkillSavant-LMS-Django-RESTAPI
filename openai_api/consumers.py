@@ -11,16 +11,11 @@ openAI_client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 class LearningPathConsumer(AsyncWebsocketConsumer):
     """
-    LearningPathConsumer handles websocket connections for learning path creation.
+    LearningPathConsumer WebSocket consumer class.
 
-    Key functions:
-
-    - connect: Accepts the websocket connection.
-
-    - disconnect: Handles disconnection.
-
-    - receive: Receives text data from the websocket. Calls OpenAI API to create learning path.
-    Sends response back over websocket.
+    Handles WebSocket connections for streaming OpenAI chat completions
+    for learning path course content. Clients send course name, server
+    streams back AI-generated course content until end token.
     """
 
     async def connect(self):
@@ -30,7 +25,7 @@ class LearningPathConsumer(AsyncWebsocketConsumer):
         pass
 
     async def receive(self, text_data):
-        course_name = json.loads(text_data)["course"]
+        course_name = json.loads(text_data)["course_name"]
 
         messages = assemble_prompt(course_name)
 
@@ -38,7 +33,7 @@ class LearningPathConsumer(AsyncWebsocketConsumer):
             model="gpt-3.5-turbo",
             messages=messages,
             temperature=0.2,
-            max_tokens=500,
+            max_tokens=80,
             stream=True,
         )
 
@@ -48,3 +43,4 @@ class LearningPathConsumer(AsyncWebsocketConsumer):
                     text_data=json.dumps({"content": chunk.choices[0].delta.content})
                 )
                 await asyncio.sleep(0)
+        await self.send(text_data=json.dumps({"content": "<:END:>"}))
